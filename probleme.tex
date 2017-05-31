@@ -59,11 +59,25 @@ vitesse 2 pendant 0.5 s car je consommerai 2 plutôt que 3 à la vitesse
 
 \section{TODO}
 But: maintenant on suppose que que le changement de vitesse se fait
-pendant un temps $\tau$ durant lequel la processeur ne produit
+pendant un temps $\tau$ durant lequel le processeur ne produit
 rien. On pourra aussi s'intéresser à un changement de vitesse
 progressif, modélisable par une fonction $C^1$
 
-\section{Début de de solution évidente}
+\section{Début de solution évidente}
+J'étudie actuellement cette possibilité:
+
+\begin{equation}
+J_{t-1}^{v_i} = \min
+  \begin{cases} 
+    \min_{v_j\neq v_i, v_j\geq w(1)} [\tau
+    c(0)+(1-\tau)c(v_j)+\sum_{w'\in\mathcal{W}}J_t^{v_j}(w')\times
+    P(w,w',v_j)]\\
+    c(v_i)+\sum_{w'\in\mathcal{W}}J_t^{v_i}(w')\times P(w,w',v_i)]
+    \text{ si } v_i\geq w(1)
+
+  \end{cases}
+\end{equation}  
+
 
 
 \end{document}
