@@ -1,0 +1,69 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\title{Optimisation avec incertitudes: application à la gestion énergétique}
+\begin{document}
+\maketitle
+
+\section{Le problème}
+Un processeur va à la vitesse $v(t)\in \mathbb{N}$. La consommation de
+ce processeur est $c(v)$ qui est souvent une fonction convexe, on la
+prendra souvent de la forme $c(v)=\mbox{cst}\times v^\alpha$ avec
+$\alpha>1$\\
+Le processeur doit effectuer des ``jobs'' de la forme $J_i=(a_i, s_i,
+d_i)$.
+\begin{itemize}
+\item $a_i$ est l'instant où le travail débute
+\item $s_i$ est le travail à effectuer
+\item $d_i$ est la deadline relative, c'est à dire qu'à $a_i+d_i$, le
+  travail doit être terminé.
+\end{itemize}
+Supposons que $t\in [|0,T|]$
+On note $w_t(u)$ le travail restant. $J_t(w)=$ consommation entre $t$.
+et $T$.\\
+
+Notons $J_t^*(w)$ la consommation optimale, on a alors\\
+
+\begin{equation}
+  \begin{array}{l}
+    J_T(w)=0~\forall w\in W\\
+    J_{t-1}^*(w)=\min\limits_{v\in V, v\geq w(1)}[c(v)+\sum_{w'\in
+    W}J_t^*(w')\times\mathbb{P}(w,w',v)]
+    
+  \end{array}
+\end{equation}
+À chaque instant on a une probabilité qu'un job arrive tel que:
+\begin{equation}
+  \mathbb{P}(s=\sigma, d=\delta)=p(\sigma,\delta)  
+\end{equation}
+
+On a de plus la formule:
+\begin{equation}
+  w_{t+1}(x)=T(w_t(x)-v)+\sigma H_{\delta}
+\end{equation}
+
+avec $T(f(t))=f(t+1)$, on prendra $\mathbb{P}(w, w', v)=p(\sigma,
+\delta)$.
+
+
+\section{Changement de vitesse}
+Sur la courbe ``consommation = $f(v)$'', on prend l'enveloppe
+convexe. En effet, on peut ``combiner'' les vitesses.\\
+Si je consomme 0 à la vitesse 0, 3 à la vitesse 1, et 4 à la vitesse
+2, pour produire 1 de travail, il est plus intelligent d'aller à la
+vitesse 2 pendant 0.5 s car je consommerai 2 plutôt que 3 à la vitesse
+1 pour le même travail.
+
+\section{TODO}
+But: maintenant on suppose que que le changement de vitesse se fait
+pendant un temps $\tau$ durant lequel la processeur ne produit
+rien. On pourra aussi s'intéresser à un changement de vitesse
+progressif, modélisable par une fonction $C^1$
+
+\section{Début de de solution évidente}
+
+
+\end{document}
