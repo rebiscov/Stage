@@ -1,0 +1,45 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\title{Prise en compte du délai de changement de vitesse: première idée}
+\begin{document}
+\maketitle
+
+\section{But}
+On considère toujours le problème où l'on cherche à optimiser la
+consommation d'un processeur mais cette fois, il faudra un temps
+$\tau$ pour passer d'une vitesse $v_i$ à une vitesse $v_j$ si $v_i\neq
+v_j$
+
+\section{Calcul des vitesses}
+Il faudra recalculer ``l'enveloppe convexe'' des vitesses pour que
+celle-ci prenne en compte ce délai. Ensuite, on ne va plus considérer
+$J_t^*$ (la consommation optimale) mais $J_t^{v_i}$ qui est la
+consommation optimale sachant qu'à $t-1$, on allait à la vitesse $v_i$.
+
+\section{Formule triviale}
+
+\begin{equation}
+  \resizebox{1.3\hsize}{!}{$
+    \begin{array}{ll}
+      J_T^{v_i}(w)=0 & \forall v_i, w\\
+      J_{t-1}^{v_i}(w) = \min
+      \begin{cases} 
+        \min_{v_j\neq v_i, v_j\geq w(1)} [\tau
+        \times L+(1-\tau)c(v_j)+\sum_{w'\in\mathcal{W}}J_t^{v_j}(w')\times
+        P(w,w',v_j)]\\
+        c(v_i)+\sum_{w'\in\mathcal{W}}J_t^{v_i}(w')\times P(w,w',v_i)]
+        \text{ si } v_i\geq w(1)
+
+      \end{cases} & \text{ si } 1\leq t-1 \leq T-1 \\
+      
+      J_0^{v_i}(w) = \min_{v_j\geq w(1)}c(v_j)+\sum_{w'\in\mathcal{W}}J_1^{v_j}(w')\times P(w,w',v_j)]
+
+    \end{array}
+  $}
+\end{equation}
+
+\end{document}
