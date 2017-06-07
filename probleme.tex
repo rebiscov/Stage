@@ -29,7 +29,7 @@ Notons $J_t^*(w)$ la consommation optimale, on a alors\\
 
 \begin{equation}
   \begin{array}{l}
-    J_T(w)=0~\forall w\in W\\
+    J_T^*(w)=0~\forall w\in W\\
     J_{t-1}^*(w)=\min\limits_{v\in V, v\geq w(1)}[c(v)+\sum_{w'\in
     W}J_t^*(w')\times\mathbb{P}(w,w',v)]
     
@@ -42,7 +42,7 @@ Notons $J_t^*(w)$ la consommation optimale, on a alors\\
 
 On a de plus la formule:
 \begin{equation}
-  w_{t+1}(x)=T(w_t(x)-v)+\sigma H_{\delta}
+  w_{t+1}(x)=T(w_t(x)-v)^++\sigma H_{\delta}
 \end{equation}
 
 avec $T(f(t))=f(t+1)$, on prendra $\mathbb{P}(w, w', v)=p(\sigma,

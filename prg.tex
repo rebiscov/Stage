@@ -1,0 +1,41 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\W}{\mathcal{W}}
+\newcommand{\V}{\mathcal{V}}
+\title{Algo: première implémentation}
+\begin{document}
+\maketitle
+
+\section{But}
+On va modéliser le changement de vitesse comme étant un coût
+supplémentaire. On garde presque la même formule, on va juste ajouter
+un coût $f(v_i,v_j)$ tel que:\\
+$f(v_i,v_j)=
+\begin{cases}
+  0 & \text{si } v_i=v_j \\
+  f(v_i,v_j)>0 & \text{sinon}
+\end{cases}
+$
+
+L'enjeu va être de trouver la bonne fonction $f$, sinon la formule
+change peu, mis à part qu'elle prend en compte la vitesse
+précédente. On se retrouve alors avec la formule:
+\begin{equation}
+  J_t^{v_i} =
+  \begin{cases}
+    0 & \text{si } t=T\\
+    \min_{v\in\V}
+    c(v)+f(v_i,v)+\sum_{w\in\W'}J_{t+1}^v\mathbb{P}(w,w',v) & 1\leq
+    t\leq T\\
+        \min_{v\in\V}
+    c(v)+\sum_{w\in\W'}J_{t+1}^v\mathcal{P}(w,w',v) & \text{si }t=0
+
+  \end{cases}
+\end{equation}
+\end{document}

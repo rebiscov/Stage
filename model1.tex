@@ -1,0 +1,88 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\W}{\mathcal{W}}
+\newcommand{\V}{\mathcal{V}}
+\title{Prise en compte du délai de changement de vitesse: première idée}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+Dans cette première approche, nous allons considérer que
+$\tau\in\Q$ et que lorsque que l'on passe de la vitesse $v_i$
+à $v_j$ avec $v_i\neq v_j$, alors on ne travaille pas pendant un temps
+$\tau$ et on travaille durant $1-\tau$.
+
+\section{Mise en oeuvre}
+
+\subsection{Se ramener au cas entier}
+
+Si il y a changement de vitesse de $v_i$ à $v_j$, $v_i\neq v_j$ à
+l'instant $t\in\N$, alors le travail effectué durant l'intervalle
+$[t,t+1[$ sera $(1-\tau)v_j$ ce qui n'est pas forcément entier. Or,
+$\tau\in\Q$ donc $(1-\tau)v_j\in\Q $. Ainsi, on peut écrire
+$(1-\tau)v_j=\frac{p_j}{q_j}$ avec $p_j\wedge q_j=1$. Soit
+$p=\text{PPCM}\{q_j\}$, $p\in\N$. Alors $\forall i, p\times v_i\in\N$
+et $p\times(1-\tau)v_i\in\N$, on fait alors $\V:=p\times\V$. On a
+changé les vitesses, désormais les vitesses permettent de faire $p$
+fois plus de travail qu'auparavant, il faut donc que les ``jobs''
+entrant aient des ``workloads'' $p$ fois plus important. Ainsi, on
+remplace tous les jobs $(a_i,s_i,d_i)$ par $(a_i, p\times s_i, d_i)$,
+de plus, on a un nouveau seuil maximum: $S'=p\times S$.
+\subsection{Quelques considérations}
+
+On considère le problème online. On va alors supposer que 
+l'on peut changer de vitesse seulement au début d'un intervalle de
+temps $[t,t+1[$. Cela veut dire que lorsque que l'on change de
+vitesse, la période de transition se fait dans $[t,t+\tau[$. On
+considéra de plus une consommation résiduelle ``leakage'' $L$ lorsque
+l'on change de vitesse durant le temps $\tau$.
+
+
+\section{Formule}
+
+
+\begin{equation}
+  \resizebox{1.3\hsize}{!}{$
+    \begin{array}{ll}
+      J_T^{v_i}(w)=0 & \forall v_i, w\\
+      J_{t-1}^{v_i}(w) = \min
+      \begin{cases} 
+        \min_{v_j\neq v_i, (1-\tau)v_j\geq w(1)} [\tau
+        \times L+(1-\tau)c(v_j)+\sum_{w'\in\mathcal{W}}J_t^{v_j}(w')\times
+        P(w,w',v_j)]\\
+        c(v_i)+\sum_{w'\in\mathcal{W}}J_t^{v_i}(w')\times P(w,w',v_i)]
+        \text{ si } v_i\geq w(1)
+
+      \end{cases} & \text{ si } 1\leq t-1 \leq T-1 \\
+      
+      J_0^{v_i}(w) = \min_{v_j\geq
+      w(1)}c(v_j)+\sum_{w'\in\mathcal{W}}J_1^{v_j}(w')\times
+      P(w,w',v_j)] & \forall v_i,w 
+
+    \end{array}
+  $}
+\end{equation}
+
+\section{Commentaires}
+
+\subsection{Complexité}
+
+La solution est simple car l'algorithme change peu. Néanmoins, il faut
+recalculer $J_t^*$ pour chaque vitesse, ainsi on multiplie la
+complexité par $|\V|$. Celle-ci devient alors: \[\mathcal{O}(T\times|\mathcal{V}|^2 \times
+S'\times\Delta\times C(S',\Delta))=\mathcal{O}(T\times|\mathcal{V}|^2
+\times p\times S\times\Delta\times C(p\times S,\Delta))\]
+On n'oublie pas de prendre en compte le nouveau seuil $S'$.
+
+\subsection{Avantages}
+
+Le problème change peu, la transformation est simple.
+
+\end{document}
