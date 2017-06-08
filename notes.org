@@ -5,4 +5,12 @@
     comment passer de w à w' ?\\
   * Idée: on représente les fonctions par un D-uplet (x_1 ,...,x_D) et
     on associe à chaque D-uplet un identifiant à l'aide d'une hashtable.
+  * Le programme sera fait en OCaml pour simplifier. En effet, la
+    librairie standard du C++ n'est pas assez fournie.
 
+* Corps de l'algorithme
+  * Il faut coder une fonction qui énumère les w. Rien ne sert de les
+    stocker, il faut surtout les associer à un identifiant. On
+    representera les w en tableau de taille D ou chaque case
+    representera les marches. On peut énumérer les w par une fonction
+    récursive.
