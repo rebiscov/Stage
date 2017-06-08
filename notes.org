@@ -1,0 +1,8 @@
+* Algorithme
+  * But: trouver W, l'ensemble des états\\
+    Problème: il faut un moyen simple de passer de w à w'\\
+    On peut les énumérer à l'aide d'un algorithme récursif, mais
+    comment passer de w à w' ?\\
+  * Idée: on représente les fonctions par un D-uplet (x_1 ,...,x_D) et
+    on associe à chaque D-uplet un identifiant à l'aide d'une hashtable.
+
