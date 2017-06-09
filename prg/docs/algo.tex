@@ -8,8 +8,33 @@
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\W}{\mathcal{W}}
 \newcommand{\V}{\mathcal{V}}
-\title{Algo: énumération des $w$}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\title{Algo: énumération des $w\in\W$}
 \begin{document}
 \maketitle
+
+\begin{algorithm}
+  \caption{enum W}
+  \begin{algorithmic}
+    \REQUIRE $v=(x_1,\dots, x_D), S$
+    \STATE $\sigma_1=x_1$
+    \FOR{$i=2$ to $D$}
+    \STATE $\sigma_i=x_i+\sigma_{i-1}$
+    \ENDFOR
+    \STATE
+    \STATE $ret=1$ 
+    \FOR{$i=1$ to $D$}
+    \IF{$ret \neq 0$}
+    \STATE $ret=(\sigma_i+1)/(i\times D+1)$
+    \STATE $\sigma_i= (\sigma_i+1)\%(i\times D+1)$
+    \ENDIF    
+    \STATE $x_i=\sigma_i-\sigma_{i-1}$
+    \ENDFOR
+    \RETURN $(x_1,\dots,x_D)$
+  \end{algorithmic}
+\end{algorithm}
+
+The algorithm runs in $\mathcal{O}(D)$
 
 \end{document}
