@@ -14,3 +14,5 @@
     representera les w en tableau de taille D ou chaque case
     representera les marches. On peut énumérer les w par une fonction
     récursive.
+  * Je vais coder une fonction qui lorsque qu'on l'appelle, celle-ci
+    renvoie la fonction w suivante.
