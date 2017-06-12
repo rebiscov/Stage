@@ -16,3 +16,8 @@
     récursive.
   * Je vais coder une fonction qui lorsque qu'on l'appelle, celle-ci
     renvoie la fonction w suivante.
+* Objections
+  * Je vais peut être refléchir à stocker le tout dans un tableau au
+    lieu de recalculer à chaque fois. En effet, je pourrai gagner du
+    temps et la complexité en espace de l'algorithme ne changera pas
+    car le tableau J_t^{v_i} est bien plus gros.
