@@ -16,10 +16,8 @@ let compute_next_w w s d =
     sigma_i_prev := !sigma_i;
     i := !i+1
   done;
-  w;;
+  w
 
-let t = new_w 5;;
-let t = compute_next_w t 2 5;;
 
   
 
