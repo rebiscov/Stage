@@ -41,14 +41,14 @@ The algorithm runs in $\mathcal{O}(D)$ in the worst case
     \REQUIRE $v=(x_1,\dots, x_D), S$
     \STATE $ret\leftarrow1$
     \STATE $i\leftarrow1$
-    \STATE $\sigma\leftarrow0$
     \STATE $\sigma_i\leftarrow0$
+    \STATE $\sigma_{i-1}\leftarrow0$    
     \WHILE{$i\leq D$ \AND $ret=1$}
-    \STATE $\sigma\leftarrow\sigma+x_i$
-    \STATE $\sigma_i\leftarrow\sigma$
+    \STATE $\sigma_i\leftarrow\sigma_i+w.(!i)$
     \STATE $ret\leftarrow(\sigma_i+1)/(i\times S+1)$
     \STATE $\sigma_i\leftarrow(\sigma_i+1)\%(i\times S+1)$
-    \STATE $x_i\leftarrow \sigma_i$ \COMMENT{$\sigma_{i-1}=0$}
+    \STATE $x_i\leftarrow \sigma_i-\sigma_{i-1}$
+    \STATE $\sigma_{i-1} = \sigma_i$
     \STATE $i\leftarrow i+1$
     \ENDWHILE
     \RETURN $(x_1,\dots,x_D)$
