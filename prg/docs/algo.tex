@@ -15,44 +15,16 @@
 \maketitle
 
 \begin{algorithm}
-  \caption{enum W}
+  \caption{enum\_W}
   \begin{algorithmic}
-    \REQUIRE $v=(x_1,\dots, x_D), S$
-    \STATE $ret\leftarrow1$
-    \STATE $i\leftarrow1$    
-    \FOR{$i=1$ to $D$}
-    \STATE $\sigma_i\leftarrow x_i+\sigma_{i-1}$
-    \ENDFOR
-    \WHILE{$i\leq D$ \AND $ret=1$}
-    \STATE $ret\leftarrow(\sigma_i+1)/(i\times S+1)$
-    \STATE $\sigma_i\leftarrow(\sigma_i+1)\%(i\times S+1)$
-    \STATE $x_i\leftarrow \sigma_i-\sigma_{i-1}$
-    \STATE $i\leftarrow i+1$
-    \ENDWHILE
-    \RETURN $(x_1,\dots,x_D)$
+    \REQUIRE $w,i,D,S$
+    \STATE $w[i]\leftarrow (w[i]+1)\mod (i*S+1)$
+    \IF{$w[i]=0$ \AND $i>1$}
+    \STATE $w[i]\leftarrow$ enum\_W $w$ $(i-1)$ $d$ $s$
+    \RETURN $w[i]$
+    \ELSE
+    \RETURN $w[i]$
+    \ENDIF
   \end{algorithmic}
 \end{algorithm}
-
-The algorithm runs in $\mathcal{O}(D)$ in the worst case
-
-\begin{algorithm}
-  \caption{enum W - 2}
-  \begin{algorithmic}
-    \REQUIRE $v=(x_1,\dots, x_D), S$
-    \STATE $ret\leftarrow1$
-    \STATE $i\leftarrow1$
-    \STATE $\sigma_i\leftarrow0$
-    \STATE $\sigma_{i-1}\leftarrow0$    
-    \WHILE{$i\leq D$ \AND $ret=1$}
-    \STATE $\sigma_i\leftarrow\sigma_i+w.(!i)$
-    \STATE $ret\leftarrow(\sigma_i+1)/(i\times S+1)$
-    \STATE $\sigma_i\leftarrow(\sigma_i+1)\%(i\times S+1)$
-    \STATE $x_i\leftarrow \sigma_i-\sigma_{i-1}$
-    \STATE $\sigma_{i-1} = \sigma_i$
-    \STATE $i\leftarrow i+1$
-    \ENDWHILE
-    \RETURN $(x_1,\dots,x_D)$
-  \end{algorithmic}
-\end{algorithm}
-
 \end{document}
