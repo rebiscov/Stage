@@ -5,4 +5,4 @@ clean:
 	rm *~
 
 tool: toolkit.ml
-	ocamlbuild toolkit.ml
+	ocamlbuild toolkit.native
