@@ -25,15 +25,16 @@ let get w i =
 
 let add w i e =
   let d = Array.length w in
-  let rec add_aux w i e =
+  let rec set_aux w i e =
     if i < d then
       begin
         w.(i) <- w.(i) + e;
-        add_aux w (i+1) e
+        set_aux w (i+1) e
       end
     else
       () in
   add_aux w (i-1) e
+
 
 let inc_time w v =
   let d = Array.length w in
@@ -43,9 +44,5 @@ let inc_time w v =
   w.(d-1) <- w.(d-2);
   ()
     
-let time_shift w d s v =
-  inc_time w v;
-  let next_states = Array.make_matrix d s w in
-  let w_org = copy w in
-  next_states
   
+    
