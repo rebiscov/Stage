@@ -21,7 +21,7 @@ let compute_next_w w d s =
   ()
 
 let get w i =
-  w.(i)
+  w.(i-1)
 
 let add w i e =
   let d = Array.length w in
@@ -33,7 +33,7 @@ let add w i e =
       end
     else
       () in
-  add_aux w i e
+  add_aux w (i-1) e
 
 let inc_time w v =
   let d = Array.length w in
