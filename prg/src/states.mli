@@ -17,3 +17,9 @@ val add : w -> int -> int -> unit
 
 val inc_time : w -> int -> unit
 (** Computes w_t from w_t-1 with s=0 and d=0 and v provided by the user (see Lemma 1 of the paper) *)
+
+val time_shift : w -> int -> int -> int -> w array array
+(** take a w and returns an array containing all the possible next w_s *)
+
+  
+  
