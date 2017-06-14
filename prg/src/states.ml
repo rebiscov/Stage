@@ -38,7 +38,6 @@ let add w i e =
       () in
   add_aux w (i-1) e
 
-
 let inc_time w v =
   let d = Array.length w in
   for i=0 to d-2 do
@@ -47,5 +46,11 @@ let inc_time w v =
   w.(d-1) <- w.(d-2);
   ()
     
+let set w x e =
+  let d = Array.length w in
+  w.(x-1) <- e;
+  if x < d && w.(x) < w.(x-1) then
+    failwith("States.set: not a valid value, this is not a valid remaining function anymore")
+  else
+    ()
   
-    
