@@ -43,7 +43,7 @@ let inc_time w v =
   for i=0 to d-2 do
     w.(i) <- max (w.(i+1)-v) 0;
   done;
-  w.(d-1) <- 0;
+  w.(d-1) <- w.(d-2);
   ()
     
   
