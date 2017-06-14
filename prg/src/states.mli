@@ -19,7 +19,7 @@ val inc_time : w -> int -> unit
 (** Computes w_t from w_t-1 with s=0 and d=0 and v provided by the user (see Lemma 1 of the paper) *)
 
 val set : w -> int -> int -> unit
-(** Set the cell w[x] *)
+(** Set the value of the cell w[x] *)
 
 
 
