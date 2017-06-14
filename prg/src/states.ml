@@ -21,7 +21,10 @@ let compute_next_w w d s =
   ()
 
 let get w i =
-  w.(i-1)
+  if i = 0 then
+    0
+  else
+    w.(i-1)
 
 let add w i e =
   let d = Array.length w in
