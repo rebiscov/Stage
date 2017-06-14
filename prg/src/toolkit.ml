@@ -17,8 +17,10 @@ let () =
     end
   else
     ();
-  printf "yo\n"
-
+  let d = int_of_string Sys.argv.(1) in
+  let s = int_of_string Sys.argv.(2) in
+  ()
+  
   
 
   
