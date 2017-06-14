@@ -21,9 +21,6 @@ val inc_time : w -> int -> unit
 val set : w -> int -> int -> unit
 (** Set the value of the cell w[x] *)
 
-
-
-
-  
-
+val is_null : w -> bool
+(** returns true if w is the 0 function *)
 

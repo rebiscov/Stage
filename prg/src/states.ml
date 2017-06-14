@@ -54,3 +54,5 @@ let set w x e =
   else
     ()
   
+let is_null w =
+  Array.for_all (fun w -> x = 0) w
