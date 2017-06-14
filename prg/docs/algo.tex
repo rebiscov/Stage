@@ -6,13 +6,17 @@
 \usepackage{graphicx}
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\N}{\mathbb{N}}
+\newcommand{\Prob}{\mathbb{P}}
 \newcommand{\W}{\mathcal{W}}
 \newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathcal{A}}
 \usepackage{algorithm}
 \usepackage{algorithmic}
-\title{Algo: énumération des $w\in\W$}
+\title{Algorithmes pour le programme}
 \begin{document}
 \maketitle
+
+\section{Enumération des $w\in\W$}
 
 \begin{algorithm}
   \caption{enum\_W}
@@ -27,4 +31,26 @@
     \ENDIF
   \end{algorithmic}
 \end{algorithm}
+
+\section{Algo principal}
+
+\begin{algorithm}
+  \caption{Algo dynamique}
+  \begin{algorithmic}
+    \STATE $t\leftarrow T$
+    \FORALL{$w\in\W,v\in\V$}
+    \STATE $J_T^v(w)\leftarrow0$
+    \ENDFOR
+    \WHILE{$t\geq2$}
+    \FORALL{$w\in\W,v\in\V$}
+    \STATE $J_{t-1}^v(w)\leftarrow \min\limits_{u\in\A(w)} c(u)+f(v,u)+\sum\limits_{w'\in\W}J_t^u\times\Prob(w,w',u)$
+    \ENDFOR
+    \STATE $t\leftarrow t-1$
+    \ENDWHILE
+    \FORALL{$w\in\W,v\in\V$}
+    \STATE $J_0^v(w)\leftarrow\min\limits_{u\in\A(w)} c(u)+\sum\limits_{w'\in\W}J_t^u\times\Prob(w,w',u)$
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
+
 \end{document}
