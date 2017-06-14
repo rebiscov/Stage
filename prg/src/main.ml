@@ -1,5 +1,6 @@
-open States
+open Printf
 
 let () =
-  Printf.printf "Hello world !\n"
+  Printf.printf "DP algorithm, first version\n"
+  
    
