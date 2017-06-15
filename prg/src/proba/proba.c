@@ -28,6 +28,7 @@ int main(int argc, char *argv[]){
     perror("fopen");
     exit(1);
   }
+  fprintf(fd, "%u %u\n", d, s);
 
   uniform_distribution(d, s, fd);
 
