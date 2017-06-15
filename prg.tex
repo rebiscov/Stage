@@ -27,14 +27,14 @@ L'enjeu va être de trouver la bonne fonction $f$, sinon la formule
 change peu, mis à part qu'elle prend en compte la vitesse
 précédente. On se retrouve alors avec la formule:
 \begin{equation}
-  J_t^{v_i} =
+  J_t^{v_i}(w) =
   \begin{cases}
     0 & \text{si } t=T\\
     \min_{v\in\V}
-    c(v)+f(v_i,v)+\sum_{w\in\W'}J_{t+1}^v\times\mathbb{P}(w,w',v) & 1\leq
+    c(v)+f(v_i,v)+\sum_{w'\in\W}J_{t+1}^v(w')\times\mathbb{P}(w,w',v) & 1\leq
     t\leq T-1\\
         \min_{v\in\V}
-    c(v)+\sum_{w\in\W'}J_{t+1}^v\times\mathbb{P}(w,w',v) & \text{si }t=0
+    c(v)+\sum_{w\in\W'}J_{t+1}^v(w')\times\mathbb{P}(w,w',v) & \text{si }t=0
 
   \end{cases}
 \end{equation}
