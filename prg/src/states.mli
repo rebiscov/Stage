@@ -22,5 +22,7 @@ val set : w -> int -> int -> unit
 (** Set the value of the cell w[x] *)
 
 val is_null : w -> bool
-(** returns true if w is the 0 function *)
+(** Returns true if w is the 0 function *)
 
+val state_space : int -> int -> int
+(** Returns the state space *)

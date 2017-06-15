@@ -56,3 +56,6 @@ let set w x e =
   
 let is_null w =
   Array.for_all (fun x -> x = 0) w
+
+let state_space d s =
+  Math.c d s
