@@ -99,6 +99,7 @@ let () =
           if i >= S.get w 1 then
             cost := min (compute_sum w' d s i opt distribution h !t) !cost
         done;
+        opt.(Hashtbl.find h w).(!t).(i) <- !cost
       done;
       
       t := !t-1;
