@@ -39,10 +39,10 @@ int main(int argc, char *argv[]){
 
 void uniform_distribution(unsigned int d, unsigned int s, FILE* fd){
   unsigned int i, j;
-  double p = 1/(float)(s*d);
+  double p = 1/(float)(s*d+1);
   
   for (i = 0; i < C(d, s); i++){
-    for (j = 0; j < s*d-1; j++)
+    for (j = 0; j < s*d; j++)
       fprintf(fd, "%f ", p);
     fprintf(fd, "%f\n", p);
   }
