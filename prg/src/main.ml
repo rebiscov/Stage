@@ -9,7 +9,7 @@ let compute_sum w d s v opt distribution h = (* Computes the sum in the main alg
     for j=1 to d do
       let k = d-j+1 in
       S.set w' k s;
-      sum := !sum + distribution.(Hashtbl.find h w').(k-1).(i-1)*
+      sum := !sum + distribution.(Hashtbl.find h w').(k-1).(i-1)
     done;
   done;
   !sum
@@ -50,7 +50,7 @@ let () =
   let distribution = Array.make_matrix space d [||] in
   for i=0 to space-1 do
     for j=0 to d-1 do
-      distribution.(i).(j) <- Array.make s 0.
+      distribution.(i).(j) <- Array.make (s+1) 0.
     done;
   done;
   
@@ -72,6 +72,7 @@ let () =
           distribution.(!count).(i-1).(j-1) <- Scanf.bscanf ffd "%f " (fun x -> x)
       done;
     done;
+    distribution.(!count).(0).(s) <- Scanf.bscanf ffd "%f " (fun x -> x); (* Here we store the case where s=0 *)    
     count := !count + 1;
     S.compute_next_w w d s;
     if S.is_null w then
@@ -102,5 +103,5 @@ let () =
   done;
 
   close_in fd;
-  printf "Bye !\b";
+  printf "Bye !\n";
   ()
