@@ -1,6 +1,20 @@
 open Printf
 module S = States
 
+let compute_sum w d s v opt distribution h = (* Computes the sum in the main algorithm *)
+  S.inc_time w v;
+  let sum = ref 0 in
+  for i=1 to s do
+    let w' = S.copy w in
+    for j=1 to d do
+      let k = d-j+1 in
+      S.set w' k s;
+      sum := !sum + distribution.(Hashtbl.find h w').(k-1).(i-1)*
+    done;
+  done;
+  !sum
+
+         
 let () =
   printf "DP algorithm, first version\n";
   if (Array.length Sys.argv < 4) then
@@ -23,6 +37,13 @@ let () =
   let (d, s) = Scanf.bscanf ffd "%d %d\n" (fun x y -> (x,y)) in
   let space = S.state_space d s in
 
+  (* We check if maximal speed is sufficient *)
+  if v_max < d*s then
+    printf "WARNING: speed is not great enough, you may encouter a major failure during computation !\n"
+  else
+    ();
+
+
   (* Defining the hashtable, the distribution and the array of the expected consumption *)
   let h = Hashtbl.create space in
   
@@ -33,9 +54,9 @@ let () =
     done;
   done;
   
-  let opt = Array.make_matrix space (bt+1) [||] in
-  for i=0 to space - 1 do
-    for j=0 to bt do
+  let opt = Array.make_matrix (bt+1) space [||] in
+  for i=0 to bt do
+    for j=0 to space-1 do
       opt.(i).(j) <- Array.make (v_max+1) 0
     done;
   done;
@@ -57,5 +78,29 @@ let () =
       b := false
   done;
 
+  (* Now, we can begin the main algorithm *)
+  let t = ref (bt-1) in
   
+  while !t >= 1 do
+    let b = ref true in
+    let w = S.new_w d in
+    
+    while !b do (* We explore all the w *)
+      for i=0 to v_max do (* We explore all the speeds *)
+        if v_max < S.get w 1 then
+          failwith("v_max too small !")
+        else
+          ();
+        
+      done;
+      
+      t := !t-1;
+      S.compute_next_w w d s;      
+      if S.is_null w then
+        b := false
+    done;
+  done;
+
+  close_in fd;
+  printf "Bye !\b";
   ()
