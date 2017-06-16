@@ -26,3 +26,7 @@ val is_null : w -> bool
 
 val state_space : int -> int -> int
 (** Returns the state space *)
+
+val print_w : w -> unit
+(** Print w *)
+

@@ -59,3 +59,7 @@ let is_null w =
 
 let state_space d s =
   Math.c d s
+
+let print_w w =
+  Array.iter (fun x -> Printf.printf "%d " x) w;
+  Printf.printf "\n"
