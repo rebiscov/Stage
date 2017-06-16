@@ -69,12 +69,10 @@ let () =
     Hashtbl.add h w !count;
     for i=1 to d do
       for j=1 to s do
-        distribution.(!count).(i-1).(j-1) <- Scanf.bscanf ffd "%f " (fun x -> x);
-        printf "%f " distribution.(!count).(i-1).(j-1)
+        distribution.(!count).(i-1).(j-1) <- Scanf.bscanf ffd "%f " (fun x -> x)
       done;
     done;
     distribution.(!count).(0).(s) <- Scanf.bscanf ffd "%f\n" (fun x -> x); (* Here we store the case where s=0 *)
-    printf "%f " distribution.(!count).(0).(s);
     count := !count + 1;
     S.compute_next_w w d s;
     if S.is_null w then
