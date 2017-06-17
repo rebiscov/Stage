@@ -49,7 +49,7 @@ let inc_time w v =
 let set w x e =
   let d = Array.length w in
   w.(x-1) <- e;
-  if (x < d && w.(x) < w.(x-1)) || (x > 1 && w.(x-2) < w.(x-1)) then
+  if (x < d && w.(x) < w.(x-1)) || (x > 1 && w.(x-2) > w.(x-1)) then
     failwith("States.set: not a valid value, this is not a valid remaining function anymore")
   else
     ()
