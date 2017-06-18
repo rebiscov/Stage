@@ -14,7 +14,6 @@ let compute_sum w d s v opt distribution h t = (* Computes the sum in the main a
     done;
   done;
   !sum +. distribution.(id_w).(0).(s) *. opt.(t+1).(id_w).(v) (* distribution.(id_w).(0).(s) proba to go from w to w' with delta=s=0 (no work has arrived) *)
-
          
 let () =
   printf "DP algorithm, first version\n";
@@ -66,18 +65,19 @@ let () =
   let w = S.new_w d in
   let count = ref 0 in
   let b = ref true in
+  
   while !b do
-    Hashtbl.add h w !count;
+    Hashtbl.add h (S.copy w) !count; (* Giving a number to current w *)
     for i=1 to d do
       for j=1 to s do
-        distribution.(!count).(i-1).(j-1) <- Scanf.bscanf ffd "%f " (fun x -> x)
+        distribution.(!count).(i-1).(j-1) <- Scanf.bscanf ffd "%f " (fun x -> x) (* Loading distribution of all the state we can go from w *)
       done;
     done;
     distribution.(!count).(0).(s) <- Scanf.bscanf ffd "%f\n" (fun x -> x); (* Here we store the case where s=0 *)
     count := !count + 1;
     S.compute_next_w w d s;
     if S.is_null w then
-      b := false
+      b := false;
   done;
 
   (* Now, we can begin the main algorithm *)
@@ -94,20 +94,23 @@ let () =
         else
           ();
         let w' = S.copy w in
-        let cost = ref (compute_sum w' d s v_max opt distribution h !t) in
+        let cost = ref ((compute_sum w' d s v_max opt distribution h !t)) in
         for i=0 to v_max-1 do
           if i >= S.get w 1 then
             cost := min (compute_sum w' d s i opt distribution h !t) !cost
         done;
-        opt.(Hashtbl.find h w).(!t).(i) <- !cost
+        opt.(!t).(Hashtbl.find h w).(i) <- !cost;
       done;
       
-      t := !t-1;
       S.compute_next_w w d s;      
       if S.is_null w then
         b := false
     done;
+    t := !t-1;
   done;
+
+  (* Case where t=0 *)
+  
 
   close_in fd;
   printf "Bye !\n";
