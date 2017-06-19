@@ -15,7 +15,10 @@ let compute_sum w'' d s v opt distribution h t = (* Computes the sum in the main
     done;
   done;
   !sum +. distribution.(id_w).(0).(s) *. opt.(t+1).(id_w).(v) (* distribution.(id_w).(0).(s) proba to go from w to w' with delta=s=0 (no work has arrived) *)
-         
+
+  
+(** MAIN FUNCTION *)
+  
 let () =
   printf "DP algorithm, first version\n";
   if (Array.length Sys.argv < 4) then
