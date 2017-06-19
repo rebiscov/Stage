@@ -4,6 +4,7 @@ clean:
 	ocamlbuild -clean
 clemacs:
 	rm *~
-
 tool: toolkit.ml
 	ocamlbuild toolkit.native
+simu: simu.ml
+	ocamlbuild simu.native

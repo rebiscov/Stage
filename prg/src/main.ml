@@ -10,7 +10,7 @@ let compute_sum w'' d s v opt distribution h t = (* Computes the sum in the main
     let w' = S.copy w in
     for j=1 to d do
       let k = d-j+1 in
-      S.set w' k (1 + S.get w' k);
+      S.set w' k (s + S.get w' k);
       sum := !sum +. distribution.(id_w).(k-1).(i-1) *. opt.(t+1).(Hashtbl.find h w').(v);
     done;
   done;
