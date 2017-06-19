@@ -69,7 +69,6 @@ let () =
   
   while !b do
     Hashtbl.add h (S.copy w) !count; (* Giving a number to current w *)
-    if w = [|0;0;10;10|] then printf "WIN\n";
     for i=1 to d do
       for j=1 to s do
         distribution.(!count).(i-1).(j-1) <- Scanf.bscanf ffd "%f " (fun x -> x) (* Loading distribution of all the state we can go from w *)

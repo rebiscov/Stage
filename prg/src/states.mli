@@ -1,4 +1,4 @@
-type w = int array
+type w
 
 val new_w : int -> w
 (** Construct the state 0 (the function always equals to zero *)
