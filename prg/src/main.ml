@@ -1,7 +1,8 @@
 open Printf
 module S = States
 
-let compute_sum w d s v opt distribution h t = (* Computes the sum in the main algorithm *)
+let compute_sum w'' d s v opt distribution h t = (* Computes the sum in the main algorithm *)
+  let w = S.copy w'' in
   S.inc_time w v;
   let id_w = Hashtbl.find h w in
   let sum = ref 0. in
@@ -39,7 +40,7 @@ let () =
 
   (* We check if maximal speed is sufficient *)
   if v_max < d*s then
-    printf "WARNING: speed is not great enough, you may encouter a major failure during computation !\n"
+    failwith("ERROR: speed is not great enough, you will encouter a major failure during computation !\n")
   else
     ();
 
@@ -93,11 +94,10 @@ let () =
           failwith("v_max too small !")
         else
           ();
-        let w' = S.copy w in
-        let cost = ref ((compute_sum w' d s v_max opt distribution h !t)) in
-        for i=0 to v_max-1 do
-          if i >= S.get w 1 then
-            cost := min (compute_sum w' d s i opt distribution h !t) !cost
+        let cost = ref ((Funs.f i v_max) +. (Funs.c v_max) +. (compute_sum w d s v_max opt distribution h !t)) in
+        for j=0 to v_max-1 do
+          if j >= S.get w 1 then
+            cost := min ((Funs.f i j) +. (Funs.c j) +. (compute_sum w d s j opt distribution h !t)) !cost
         done;
         opt.(!t).(Hashtbl.find h w).(i) <- !cost;
       done;
@@ -110,7 +110,20 @@ let () =
   done;
 
   (* Case where t=0 *)
+  let b = ref true in
+  let w = S.new_w d in
   
+  while !b do
+    let w' = S.copy w in
+    let cost = ref ((Funs.c v_max) +. (compute_sum w' d s v_max opt distribution h !t)) in
+    for i=0 to v_max-1 do
+      cost := min !cost ((Funs.c v_max) +. (compute_sum w' d s v_max opt distribution h !t))
+    done;
+
+    S.compute_next_w w d s;
+    if S.is_null w then
+      b := false
+  done;
 
   close_in fd;
   printf "Bye !\n";
