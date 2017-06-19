@@ -21,9 +21,9 @@ let compute_sum w'' d s v opt distribution h t = (* Computes the sum in the main
   
 let () =
   printf "DP algorithm, first version\n";
-  if (Array.length Sys.argv < 4) then
+  if (Array.length Sys.argv < 5) then
     begin
-      printf "Use: %s T v_max distribustion_file options\n" Sys.argv.(0);
+      printf "Use: %s T v_max distribustion_file out_file options\n" Sys.argv.(0);
       exit 1
     end
   else
@@ -48,7 +48,7 @@ let () =
     ();
 
 
-  (* Defining the hashtable, the distribution, the w_set and the array of the expected consumption *)
+  (* Defining the hashtable, the distribution, the w_set, the best policies array and the array of the expected consumption *)
   let h = Hashtbl.create space in
   
   let distribution = Array.make_matrix space d [||] in
@@ -59,6 +59,13 @@ let () =
   done;
 
   let w_set = S.compute_w d s in
+
+  let pol = Array.make_matrix (bt+1) space [||] in
+  for i=0 to bt do
+    for j=0 to space-1 do
+      pol.(i).(j) <- Array.make (v_max+1) 0
+    done;
+  done;
   
   let opt = Array.make_matrix (bt+1) space [||] in
   for i=0 to bt do
@@ -86,13 +93,24 @@ let () =
   while !t >= 1 do
     for k=0 to space-1 do (* We explore all the w *)
       let w = w_set.(k) in
+      
       for i=0 to v_max do (* We explore all the speeds *)
         let cost = ref ((Funs.f i v_max) +. (Funs.c v_max) +. (compute_sum w d s v_max opt distribution h !t)) in
+        let p = ref v_max in
         for j=0 to v_max-1 do
           if j >= S.get w 1 then
-            cost := min ((Funs.f i j) +. (Funs.c j) +. (compute_sum w d s j opt distribution h !t)) !cost
+            begin
+              let c = ((Funs.f i j) +. (Funs.c j) +. (compute_sum w d s j opt distribution h !t)) in
+              if c < !cost then
+                begin
+                  cost := c;
+                  p := j
+                end
+            end
         done;
-        opt.(!t).(Hashtbl.find h w).(i) <- !cost;
+        let id = Hashtbl.find h w in
+        opt.(!t).(id).(i) <- !cost;
+        pol.(!t).(id).(i) <- !p
       done;
     done;
     t := !t-1;
@@ -103,11 +121,35 @@ let () =
   for k=0 to space-1 do
     let w' = S.copy w_set.(k) in
     let cost = ref ((Funs.c v_max) +. (compute_sum w' d s v_max opt distribution h !t)) in
+    let p = ref v_max in
     for i=0 to v_max-1 do
-      cost := min !cost ((Funs.c v_max) +. (compute_sum w' d s v_max opt distribution h !t))
+      if i >= S.get w' 1 then
+        begin
+          let c = ((Funs.c i) +. (compute_sum w' d s v_max opt distribution h !t)) in
+          if c < !cost then
+            begin
+              cost := c;
+              p := i
+            end
+        end
     done;
   done;
-
   close_in fd;
+
+  (* Output best policies array *)
+  let fd = open_out Sys.argv.(4) in
+
+  for i=1 to bt do
+    for j=0 to space-2 do
+      for k=0 to v_max do
+        fprintf fd "%d " pol.(i).(j).(k)
+      done;
+    done;
+    for k=0 to v_max-1 do
+      fprintf "%d " pol.(i).(j
+    done;
+  done;
+  close_out fd;
+  
   printf "Bye !\n";
   ()
