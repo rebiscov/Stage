@@ -5,20 +5,43 @@ let new_w d =
 
 let copy w =
   Array.copy w
+  
+let is_null w =
+  Array.for_all (fun x -> x = 0) w
 
-let rec compute_next_w_i w i d s res =
-  w.(i) <- (w.(i)+1)mod((d-i)*s+1);
-  if w.(i) = 0 && i < d-1 && res > 0 then
+let state_space d s =
+  Math.c d s
+
+let print_w w =
+  Array.iter (fun x -> Printf.printf "%d " x) w;
+  Printf.printf "\n"
+  
+let rec compute_w_i w_set w d s sigma_i i index =
+  if i >= d then
     begin
-      w.(i) <- compute_next_w_i w (i+1) d s (res-1);
-      w.(i)
+      w_set.(!index) <- Array.copy w;
+      index := !index + 1
     end
   else
-    w.(i)
-
-let compute_next_w w d s =
-  let _ = compute_next_w_i w 0 d s (d*s) in
-  ()
+    begin
+      for sigma=sigma_i to (i+1)*s do
+        w.(d-i-1) <- sigma;
+        compute_w_i w_set w d s sigma (i+1) index
+      done
+    end
+  
+let compute_w d s =
+  let space = state_space d s in
+  let w_set = Array.make space [||] in
+  compute_w_i w_set (Array.make d 0) d s 0 0 (ref 0);
+  for i=0 to space-1 do
+    w_set.(i).(0) <- w_set.(i).(0) - w_set.(i).(1);
+    for j=1 to d-2 do
+      w_set.(i).(j) <- w_set.(i).(j-1) + w_set.(i).(j) - w_set.(i).(j+1)
+    done;
+    w_set.(i).(d-1) <- w_set.(i).(d-2) + w_set.(i).(d-1);
+  done;
+  w_set
 
 let get w i =
   if i = 0 then
@@ -53,13 +76,3 @@ let set w x e =
     failwith("States.set: not a valid value, this is not a valid remaining function anymore")
   else
     ()
-  
-let is_null w =
-  Array.for_all (fun x -> x = 0) w
-
-let state_space d s =
-  Math.c d s
-
-let print_w w =
-  Array.iter (fun x -> Printf.printf "%d " x) w;
-  Printf.printf "\n"

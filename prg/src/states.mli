@@ -6,8 +6,8 @@ val new_w : int -> w
 val copy : w -> w
 (** Copy a remaining work function *)  
   
-val compute_next_w : w -> int -> int -> unit
-(** Given a state, it computes the next state *)
+val compute_w : int -> int -> w array
+(** Computes the set W *)
 
 val get : w -> int -> int
 (** Give the value of w[i], w being the remaining work function *)
