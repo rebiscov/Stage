@@ -45,7 +45,7 @@ let () =
     ();
 
 
-  (* Defining the hashtable, the distribution and the array of the expected consumption *)
+  (* Defining the hashtable, the distribution, the w_set and the array of the expected consumption *)
   let h = Hashtbl.create space in
   
   let distribution = Array.make_matrix space d [||] in
@@ -54,6 +54,8 @@ let () =
       distribution.(i).(j) <- Array.make (s+1) 0.
     done;
   done;
+
+  let w_set = S.compute_w d s in
   
   let opt = Array.make_matrix (bt+1) space [||] in
   for i=0 to bt do
@@ -63,32 +65,24 @@ let () =
   done;
 
   (* Extracting the distribution from the file and giving a number to each of the w *)
-  let w = S.new_w d in
-  let count = ref 0 in
-  let b = ref true in
   
-  while !b do
-    Hashtbl.add h (S.copy w) !count; (* Giving a number to current w *)
+  for k=0 to space-1 do
+    let w = w_set.(k) in
+    Hashtbl.add h (S.copy w) k; (* Giving a number to current w *)
     for i=1 to d do
       for j=1 to s do
-        distribution.(!count).(i-1).(j-1) <- Scanf.bscanf ffd "%f " (fun x -> x) (* Loading distribution of all the state we can go from w *)
+        distribution.(k).(i-1).(j-1) <- Scanf.bscanf ffd "%f " (fun x -> x) (* Loading distribution of all the state we can go from w *)
       done;
     done;
-    distribution.(!count).(0).(s) <- Scanf.bscanf ffd "%f\n" (fun x -> x); (* Here we store the case where s=0 *)
-    count := !count + 1;
-    S.compute_next_w w d s;
-    if S.is_null w then
-      b := false;
+    distribution.(k).(0).(s) <- Scanf.bscanf ffd "%f\n" (fun x -> x); (* Here we store the case where s=0 *)
   done;
 
   (* Now, we can begin the main algorithm *)
   let t = ref (bt-1) in
 
   while !t >= 1 do
-    let b = ref true in
-    let w = S.new_w d in
-    
-    while !b do (* We explore all the w *)
+    for k=0 to space-1 do (* We explore all the w *)
+      let w = w_set.(k) in
       for i=0 to v_max do (* We explore all the speeds *)
         let cost = ref ((Funs.f i v_max) +. (Funs.c v_max) +. (compute_sum w d s v_max opt distribution h !t)) in
         for j=0 to v_max-1 do
@@ -97,28 +91,18 @@ let () =
         done;
         opt.(!t).(Hashtbl.find h w).(i) <- !cost;
       done;
-
-      S.compute_next_w w d s;
-      if S.is_null w then
-        b := false
     done;
     t := !t-1;
   done;
 
   (* Case where t=0 *)
-  let b = ref true in
-  let w = S.new_w d in
   
-  while !b do
-    let w' = S.copy w in
+  for k=0 to space-1 do
+    let w' = S.copy w_set.(k) in
     let cost = ref ((Funs.c v_max) +. (compute_sum w' d s v_max opt distribution h !t)) in
     for i=0 to v_max-1 do
       cost := min !cost ((Funs.c v_max) +. (compute_sum w' d s v_max opt distribution h !t))
     done;
-
-    S.compute_next_w w d s;
-    if S.is_null w then
-      b := false
   done;
 
   close_in fd;
