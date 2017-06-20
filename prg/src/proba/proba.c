@@ -43,11 +43,11 @@ void simple_distribution(unsigned int d, unsigned int s, FILE* fd){
 
   for (i = 0; i < C(d, s); i++){
     for (j = 0; j < (s+1)*d-1; j++)
-      if (j/(s+1) == 1 && j%d == 0)
+      if (j/(s+1) == 0 && j%(s+1) == 1)
 	fprintf(fd, "1 ");
       else
 	fprintf(fd, "0 ");
-    if (((s+1)*d-1)/(s+1) == 1 && ((s+1)*d-1)%d == 0)
+    if (((s+1)*d-1)/(s+1) == 0 && ((s+1)*d-1)%(s+1) == 1)
       fprintf(fd, "1\n");
     else
       fprintf(fd, "0\n");
