@@ -20,5 +20,5 @@ x = np.linspace(0, t-1, t)
 
 plt.xlim(0,t)
 plt.plot(x, num[0])
-plt.plot(x, num[1])
+plt.step(x, num[1], where ='post')
 plt.show()
