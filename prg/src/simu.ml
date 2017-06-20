@@ -6,17 +6,22 @@ let rand_couple d s id_w distribution =
   let cumulative = Array.make (d*(s+1)) 0. in
   cumulative.(0) <- distribution.(id_w).(0).(0);
   for i=1 to d*(s+1)-1 do
-    cumulative.(i) <- distribution.(id_w).(i mod (s+1)).(i/(s+1)) +. cumulative.(i-1)
+    cumulative.(i) <- distribution.(id_w).(i mod (s+1)).(i/(s+1)) +. cumulative.(i-1);
   done;
-
-  Random.init (int_of_float (Unix.time ()));
 
   let r = Random.float 1. in
   let i = ref 0 in
   while cumulative.(!i) < r do
-    i := !i + 1
+    i := !i + 1;
   done;
   ((!i mod (s+1))+1, !i / (s+1))
+
+(* The function which updates the array representing the work that must be done before time t *)
+  
+  let update_d d t delta sigma =
+    for i=t+delta to Array.length d -1 do
+      d.(i) <- d.(i) + sigma
+    done  
          
 (* MAIN FUNCTION *)
 
@@ -28,6 +33,9 @@ let () =
     end
   else
     ();
+
+  (* Initialise the random number generator *)
+  Random.init (int_of_float (Unix.time ()));
   
   (* Opening the files *)
   let dist' = open_in Sys.argv.(3) in
@@ -85,11 +93,17 @@ let () =
   
   let w = S.new_w d in
   let speeds = Array.make bt 0 in
+  let last_speed = ref 0 in
+  let work_t = Array.make (bt+1) 0 in
 
   for i=0 to bt-1 do
     let (delta, sigma) = rand_couple d s (Hashtbl.find h w) distribution in
+    Printf.printf "%d %d\n" delta sigma;
+    update_d work_t i delta sigma;
     S.add_work w delta sigma;
-    ()
+    speeds.(i) <- pol.(i).(Hashtbl.find h w).(!last_speed);
+    last_speed := speeds.(i);
+    S.inc_time w !last_speed
   done;
   ()
   
