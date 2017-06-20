@@ -27,6 +27,9 @@ val is_null : w -> bool
 val state_space : int -> int -> int
 (** Returns the state space *)
 
+val add_work : w -> int -> int -> unit
+(** Add workload sigma with deadline delta to w *)
+
 val print_w : w -> unit
 (** Print w *)
 
