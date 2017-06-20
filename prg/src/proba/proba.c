@@ -7,7 +7,7 @@ void uniform_distribution(unsigned int d, unsigned int s, FILE* fd);
 void simple_distribution(unsigned int d, unsigned int s, FILE* fd);
 
 int main(int argc, char *argv[]){
-  unsigned int d, s;
+  unsigned int d, s, c;
   char *filename = NULL;
   FILE* fd = NULL;
   
@@ -31,7 +31,18 @@ int main(int argc, char *argv[]){
   }
   fprintf(fd, "%u %u\n", d, s);
 
-  simple_distribution(d, s, fd);
+  printf("Which distribution do you need ?\n0.Simple distribution\n1.Uniform distribution\n");
+  scanf("%u", &c);
+
+  switch(c){
+  case 0:
+    simple_distribution(d, s, fd);
+    break;
+  case 1:
+    uniform_distribution(d, s, fd);
+  default:
+    exit(1);
+  }
 
   fclose(fd);
 
