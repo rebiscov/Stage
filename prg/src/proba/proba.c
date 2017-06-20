@@ -4,6 +4,7 @@
 unsigned int bino(unsigned int k, unsigned int n);
 unsigned int C(unsigned int d, unsigned int s);
 void uniform_distribution(unsigned int d, unsigned int s, FILE* fd);
+void simple_distribution(unsigned int d, unsigned int s, FILE* fd);
 
 int main(int argc, char *argv[]){
   unsigned int d, s;
@@ -30,11 +31,27 @@ int main(int argc, char *argv[]){
   }
   fprintf(fd, "%u %u\n", d, s);
 
-  uniform_distribution(d, s, fd);
+  simple_distribution(d, s, fd);
 
   fclose(fd);
 
   return 0;
+}
+
+void simple_distribution(unsigned int d, unsigned int s, FILE* fd){
+  unsigned int i ,j;
+
+  for (i = 0; i < C(d, s); i++){
+    for (j = 0; j < (s+1)*d-1; j++)
+      if (j/(s+1) == 1 && j%d == 0)
+	fprintf(fd, "1 ");
+      else
+	fprintf(fd, "0 ");
+    if (((s+1)*d-1)/(s+1) == 1 && ((s+1)*d-1)%d == 0)
+      fprintf(fd, "1\n");
+    else
+      fprintf(fd, "0\n");
+  }
 }
 
 void uniform_distribution(unsigned int d, unsigned int s, FILE* fd){
