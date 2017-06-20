@@ -84,10 +84,12 @@ let () =
   (* The simulation starts here *)
   
   let w = S.new_w d in
+  let speeds = Array.make bt 0 in
 
   for i=0 to bt-1 do
     let (delta, sigma) = rand_couple d s (Hashtbl.find h w) distribution in
-    
+    S.add_work w delta sigma;
+    ()
   done;
   ()
   
