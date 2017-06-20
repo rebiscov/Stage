@@ -7,4 +7,4 @@ clemacs:
 tool: toolkit.ml
 	ocamlbuild toolkit.native
 simu: simu.ml
-	ocamlbuild simu.native
+	ocamlbuild -pkg unix simu.native
