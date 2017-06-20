@@ -26,9 +26,9 @@ let rand_couple d s id_w distribution =
 (* MAIN FUNCTION *)
 
 let () =
-  if Array.length Sys.argv < 5 then
+  if Array.length Sys.argv < 6 then
     begin
-      Printf.printf "Use: %s T v_max distribution_file policies_file options\n" Sys.argv.(0);
+      Printf.printf "Use: %s T v_max distribution_file policies_file output_file options\n" Sys.argv.(0);
       exit 1
     end
   else
@@ -94,16 +94,34 @@ let () =
   let w = S.new_w d in
   let speeds = Array.make bt 0 in
   let last_speed = ref 0 in
-  let work_t = Array.make (bt+1) 0 in
+  let work_t = Array.make bt 0 in
 
   for i=0 to bt-1 do
     let (delta, sigma) = rand_couple d s (Hashtbl.find h w) distribution in
-    Printf.printf "%d %d\n" delta sigma;
     update_d work_t i delta sigma;
     S.add_work w delta sigma;
     speeds.(i) <- pol.(i).(Hashtbl.find h w).(!last_speed);
     last_speed := speeds.(i);
     S.inc_time w !last_speed
   done;
+
+  (* Write the results in a file *)
+
+  for i=1 to bt -1 do
+    speeds.(i) <- speeds.(i) + speeds.(i-1) (* We want the cumulated speeds *)
+  done;
+
+  let fd = open_out Sys.argv.(5) in
+  for i=0 to bt -2 do
+    Printf.fprintf fd "%d " speeds.(i)
+  done;
+  Printf.fprintf fd "%d\n" speeds.(bt-1);
+  
+  for i=0 to bt -2 do
+    Printf.fprintf fd "%d " work_t.(i)
+  done;
+  Printf.fprintf fd "%d\n" work_t.(bt-1);
+
+  close_out fd;
   ()
   
