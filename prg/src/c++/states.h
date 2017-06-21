@@ -24,6 +24,6 @@ class W{
 };
 
 std::vector<W> compute_w(unsigned int d, unsigned int s);
-
+unsigned int state_space(unsigned int d, unsigned int s);
 
 #endif
