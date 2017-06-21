@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
-#include <map>
 #include "states.h"
 
 int main(int argc, char* argv[]){
@@ -35,8 +34,7 @@ int main(int argc, char* argv[]){
     exit(EXIT_FAILURE);
   }
 
-  /* Defining the hashtable, the distribution, the w_set, the best policies array and the array of the expected consumption */
-  std::map<W, unsigned int> h; /* I consider this as an hashtable */
+  /* Defining the distribution, the w_set, the best policies array and the array of the expected consumption */
 
   std::vector<std::vector<std::vector<double>>> distribution(space,std::vector<std::vector<double>>(d));
 
@@ -46,7 +44,39 @@ int main(int argc, char* argv[]){
 
   std::vector<W> w_set = compute_w(d, s);
 
-  std::vector
+  std::vector<std::vector<std::vector<unsigned int>>> pol(bt+1, std::vector<std::vector<unsigned int>>(space));
+
+  for (unsigned int i = 0; i <= bt; i++)
+    for (unsigned int j = 0; j < space; j++)
+      pol[i][j] = std::vector<unsigned int>(v_max+1, 0);
+  
+  std::vector<std::vector<std::vector<double>>> opt(bt+1, std::vector<std::vector<double>>(space));
+
+  for (unsigned int i = 0; i <= bt; i++)
+    for (unsigned int j = 0; j < space; j++)
+      opt[i][j] = std::vector<double>(v_max+1, 0.);
+
+  /* Extracting the distribution from the file and giving a number to each of the w */
+  for (unsigned int k = 0; k < space; k++){
+    w_set[k].set_id(k);
+    for (unsigned int i = 1; i <= d; i++)
+      for (unsigned int j = 0; j <= s; j++)
+	fprintf(fd, "%f", distribution[k][i-1][j]);
+  }
+
+
+  /* Now we can begin the main algorithm */
+  unsigned int t = bt-1;
+
+  while (t >= 0){
+    for (unsigned int k = 0; k < space; k++){
+      W& w = w_set[k];
+
+      for (unsigned int i = 0; i <= v_max; i++){
+	
+      }
+    }
+  }
   
   return 0;
 }
