@@ -1,5 +1,5 @@
 all:
-	g++ -c math.cpp states.cpp main.cpp
+	g++ -c math.cpp states.cpp funs.cpp main.cpp
 	g++ -o main math.o states.o main.o
 
 clemacs:
