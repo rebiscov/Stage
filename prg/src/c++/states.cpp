@@ -15,7 +15,6 @@ unsigned int& W::operator[](unsigned int i){
 
 void W::operator=(W obj){
   w = obj.w;
-  m_id = obj.m_id;
 }
 
 bool W::is_null(void){
