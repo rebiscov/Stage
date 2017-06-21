@@ -87,7 +87,6 @@ std::vector<W> compute_w(unsigned int d, unsigned int s){
   unsigned int space = state_space(d, s), index = 0;
   std::vector<W> w_set(space);
   W w(d);
-  std::cout << "space " << space << std::endl;
 
   compute_w_i(w_set, w, d, s, 0, 0, index);
 
