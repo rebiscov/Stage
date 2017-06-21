@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <vector>
 #include "states.h"
+#include "funs.h"
 
 int main(int argc, char* argv[]){
   printf("DP algorithm, C++ first version\n");
@@ -63,6 +64,7 @@ int main(int argc, char* argv[]){
       for (unsigned int j = 0; j <= s; j++)
 	fprintf(fd, "%f", distribution[k][i-1][j]);
   }
+  fclose(fd);
 
 
   /* Now we can begin the main algorithm */
@@ -80,3 +82,5 @@ int main(int argc, char* argv[]){
   
   return 0;
 }
+
+
