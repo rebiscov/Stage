@@ -7,5 +7,6 @@ clemacs:
 
 clean:
 	rm *.o
+	rm main
 
 
