@@ -9,7 +9,8 @@ class W{
   W();
   W(unsigned int d);
   unsigned int& operator[](unsigned int i);
-  void operator=(W obj);  
+  void operator=(W obj);
+  bool operator<(const W& obj) const;
   bool is_null(void);
   void add_work(unsigned int delta, unsigned int sigma);
   void print_w(void);
