@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
-#include "math.h"
-#include "states.h"
+#include "math.hpp"
+#include "states.hpp"
 
 W::W(void){
 }

@@ -1,3 +1,5 @@
+#include "math.hpp"
+
 unsigned int bino(unsigned int k, unsigned int n){
   if (k < 0)
     return 0;
