@@ -67,14 +67,6 @@ void W::set(unsigned int x, unsigned int e){
   }
 }
 
-void W::set_id(unsigned int k){
-  m_id = k;
-}
-
-unsigned int W::get_id(void){
-  return m_id;
-}
-
 unsigned int state_space(unsigned int d, unsigned int s){
   return c(d,s);
 }
