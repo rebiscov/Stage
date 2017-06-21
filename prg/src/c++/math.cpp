@@ -1,13 +1,10 @@
 unsigned int bino(unsigned int k, unsigned int n){
-  unsigned int b = 1;
-  if (k < 0 || n < k)
+  if (k < 0)
     return 0;
-  while (k > 0){
-    b *= n/k;
-    n--;
-    k--;
-  }
-  return b;
+  else if (k == 0)
+    return 1;
+  else
+    return n*bino(k-1, n-1)/k;
 }
 
 unsigned int c(unsigned int d, unsigned int s){
