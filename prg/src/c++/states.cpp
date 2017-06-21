@@ -22,6 +22,7 @@ bool W::operator<(const W& obj) const{
   for (unsigned int i = 0; i < d; i++)
     if (w[i] != obj.w[i])
       return w[i] < obj.w[i];
+  return w[d-1] < obj.w[d-1];
 }
 
 bool W::is_null(void){
