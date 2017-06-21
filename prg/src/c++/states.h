@@ -17,9 +17,11 @@ class W{
   void add(unsigned int i, unsigned int e);
   void inc_time(unsigned int v);
   void set(unsigned int x, unsigned int e);
+  void set_id(unsigned int k);
+  unsigned int get_id(void);
 
  private:
-  
+  unsigned int m_id;
   std::vector<unsigned int> w;
 };
 
