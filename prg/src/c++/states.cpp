@@ -3,6 +3,9 @@
 #include "math.h"
 #include "states.h"
 
+W::W(void){
+}
+
 W::W(unsigned int d): w(std::vector<unsigned int>(d,0)){
 }
 
@@ -74,7 +77,7 @@ void compute_w_i(std::vector<W>& w_set, W w, unsigned int d, unsigned int s, uns
     index++;
   }
   else
-    for (unsigned int sigma = sigma_i; sigma <= (i+1)*s; i++){
+    for (unsigned int sigma = sigma_i; sigma <= (i+1)*s; sigma++){
       w[d-i-1] = sigma;
       compute_w_i(w_set, w, d, s, sigma, (i+1), index);
     }
@@ -84,6 +87,7 @@ std::vector<W> compute_w(unsigned int d, unsigned int s){
   unsigned int space = state_space(d, s), index = 0;
   std::vector<W> w_set(space);
   W w(d);
+  std::cout << "space " << space << std::endl;
 
   compute_w_i(w_set, w, d, s, 0, 0, index);
 
