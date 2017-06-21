@@ -1,5 +1,5 @@
 #include <math.h>
-#include "funs.h"
+#include "funs.hpp"
 
 double f (unsigned int v1, unsigned int v2, unsigned int t){
   if (t == 0)
