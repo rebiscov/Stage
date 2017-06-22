@@ -94,12 +94,14 @@ let () =
   let fd = open_out Sys.argv.(5) in
 
   for simu=1 to nb_simulations do
+    Printf.printf "Simulation %d\n" simu;
     let w = S.new_w d in
     let speeds = Array.make bt 0 in
     let last_speed = ref 0 in
     let work_t = Array.make (bt+1) 0 in
 
     for i=0 to bt-1 do
+      Printf.printf "t=%d\n" i;
       let (delta, sigma) = rand_couple d s (Hashtbl.find h w) distribution in
       update_d work_t i delta sigma;
       S.add_work w delta sigma;
