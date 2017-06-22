@@ -24,3 +24,10 @@ unsigned int min(unsigned int a, unsigned int b){
     return a;
   return b;
 }
+
+unsigned int minus(unsigned int a, unsigned int b){
+  if (a >= b)
+    return a - b;
+  else
+    return 0;
+}
