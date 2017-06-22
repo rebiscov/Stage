@@ -5,13 +5,15 @@
 #include <thread>
 #include "states.hpp"
 #include "funs.hpp"
+#include "math.hpp"
 
 #define NB_THREADS 4
 
 /* some prototypes */
 
 double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W, unsigned int> &h, unsigned int t);
-void compute_j(std::vector<W> &w_set,unsigned int nb_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<unsigned int>>> &pol, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W,unsigned int> &h, unsigned int t);
+
+void compute_j(std::vector<W> w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> distribution, std::map<W,unsigned int> h, unsigned int t);
 
 /* MAIN FUNCTION */
 
@@ -83,7 +85,11 @@ int main(int argc, char* argv[]){
   int t = bt-1;
 
   while (t >= 0){
-    compute_j(w_set, 1, d, s, v_max, space, opt, pol, distribution, h, t);
+    std::vector<std::thread> threads;    
+    for (unsigned int k = 0; k < NB_THREADS; k++)
+      threads.push_back(std::thread (compute_j, w_set, k, d, s, v_max, space, &opt, &pol, distribution, h, t));
+    for (unsigned int k = 0; k < NB_THREADS; k++)
+      threads[k].join();
     t--;
   }
 
@@ -110,17 +116,17 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
-void compute_j(std::vector<W> &w_set,unsigned int nb_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<unsigned int>>> &pol, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W,unsigned int> &h, unsigned int t){
-  for (unsigned int k = 0; k < space; k++){ /* We explore all states */
+void compute_j(std::vector<W> w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> distribution, std::map<W,unsigned int> h, unsigned int t){
+  for (unsigned int k = id_thread*(space/NB_THREADS); k < min((id_thread+1)*(space/NB_THREADS), space); k++){ /* We explore all states */
     W& w = w_set[k];
 
     for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
-      double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, opt, distribution, h, t);
+      double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, *opt, distribution, h, t);
       unsigned int p = v_max;
 
       for (unsigned int j = 0; j < v_max; j++){
 	if (j >= w.get(1)){
-	  double co = f(i,j,t) + c(j) + compute_sum(w, d, s, j, opt, distribution, h, t);
+	  double co = f(i,j,t) + c(j) + compute_sum(w, d, s, j, *opt, distribution, h, t);
 	  if (co < cost){
 	    cost = co;
 	    p = j;
@@ -128,8 +134,8 @@ void compute_j(std::vector<W> &w_set,unsigned int nb_thread, unsigned int d, uns
 	}
       }
       unsigned int id = h[w];
-      opt[t][id][i] = cost;
-      pol[t][id][i] = p;
+      (*opt)[t][id][i] = cost;
+      (*pol)[t][id][i] = p;
     }
   }
 }
