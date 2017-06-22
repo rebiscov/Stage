@@ -2,13 +2,16 @@
 #include <cstdlib>
 #include <vector>
 #include <map>
+#include <thread>
 #include "states.hpp"
 #include "funs.hpp"
+
+#define NB_THREADS 4
 
 /* some prototypes */
 
 double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W, unsigned int> &h, unsigned int t);
-
+void compute_j(std::vector<W> &w_set,unsigned int nb_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<unsigned int>>> &pol, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W,unsigned int> &h, unsigned int t);
 
 /* MAIN FUNCTION */
 
@@ -80,27 +83,7 @@ int main(int argc, char* argv[]){
   int t = bt-1;
 
   while (t >= 0){
-    for (unsigned int k = 0; k < space; k++){ /* We explore all states */
-      W& w = w_set[k];
-
-      for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
-	double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, opt, distribution, h, t);
-	unsigned int p = v_max;
-
-	for (unsigned int j = 0; j < v_max; j++){
-	  if (j >= w.get(1)){
-	    double co = f(i,j,t) + c(j) + compute_sum(w, d, s, j, opt, distribution, h, t);
-	    if (co < cost){
-	      cost = co;
-	      p = j;
-	    }
-	  }
-	}
-	unsigned int id = h[w];
-	opt[t][id][i] = cost;
-	pol[t][id][i] = p;
-      }
-    }
+    compute_j(w_set, 1, d, s, v_max, space, opt, pol, distribution, h, t);
     t--;
   }
 
@@ -126,6 +109,31 @@ int main(int argc, char* argv[]){
   
   return 0;
 }
+
+void compute_j(std::vector<W> &w_set,unsigned int nb_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<unsigned int>>> &pol, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W,unsigned int> &h, unsigned int t){
+  for (unsigned int k = 0; k < space; k++){ /* We explore all states */
+    W& w = w_set[k];
+
+    for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
+      double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, opt, distribution, h, t);
+      unsigned int p = v_max;
+
+      for (unsigned int j = 0; j < v_max; j++){
+	if (j >= w.get(1)){
+	  double co = f(i,j,t) + c(j) + compute_sum(w, d, s, j, opt, distribution, h, t);
+	  if (co < cost){
+	    cost = co;
+	    p = j;
+	  }
+	}
+      }
+      unsigned int id = h[w];
+      opt[t][id][i] = cost;
+      pol[t][id][i] = p;
+    }
+  }
+}
+
 
 double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W,unsigned int> &h, unsigned int t){
   w.inc_time(v);
