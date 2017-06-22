@@ -61,7 +61,7 @@ void W::add(unsigned int i, unsigned int e){
 void W::inc_time(unsigned int v){
   unsigned int d = w.size();
   for (unsigned int i = 0; i < d-1; i++)
-    w[i] = max(w[i+1]-v, 0);
+    w[i] = minus(w[i+1], v);
   w[d-1] = w[d-2];
 }
 
