@@ -1,8 +1,16 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
-#include "states.h"
-#include "funs.h"
+#include <map>
+#include "states.hpp"
+#include "funs.hpp"
+
+/* some prototypes */
+
+double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W, unsigned int> &h, unsigned int t);
+
+
+/* MAIN FUNCTION */
 
 int main(int argc, char* argv[]){
   printf("DP algorithm, C++ first version\n");
@@ -25,9 +33,10 @@ int main(int argc, char* argv[]){
     perror("fopen");
 
   unsigned int d, s;
-  fprintf(fd, "%d %d", &d, &s);
+  fscanf(fd, "%u %u", &d, &s);
 
   unsigned int space = state_space(d, s);
+
 
   /* We check if maximal speed if sufficient */
   if (v_max < d*s){
@@ -35,7 +44,8 @@ int main(int argc, char* argv[]){
     exit(EXIT_FAILURE);
   }
 
-  /* Defining the distribution, the w_set, the best policies array and the array of the expected consumption */
+  /* Defining the hashtable, the distribution, the w_set, the best policies array and the array of the expected consumption */
+  std::map<W, unsigned int> h;
 
   std::vector<std::vector<std::vector<double>>> distribution(space,std::vector<std::vector<double>>(d));
 
@@ -46,7 +56,7 @@ int main(int argc, char* argv[]){
   std::vector<W> w_set = compute_w(d, s);
 
   std::vector<std::vector<std::vector<unsigned int>>> pol(bt+1, std::vector<std::vector<unsigned int>>(space));
-
+  
   for (unsigned int i = 0; i <= bt; i++)
     for (unsigned int j = 0; j < space; j++)
       pol[i][j] = std::vector<unsigned int>(v_max+1, 0);
@@ -59,28 +69,60 @@ int main(int argc, char* argv[]){
 
   /* Extracting the distribution from the file and giving a number to each of the w */
   for (unsigned int k = 0; k < space; k++){
-    w_set[k].set_id(k);
+    h[w_set[k]] = k;
     for (unsigned int i = 1; i <= d; i++)
       for (unsigned int j = 0; j <= s; j++)
-	fprintf(fd, "%f", distribution[k][i-1][j]);
+	fscanf(fd, "%f", &distribution[k][i-1][j]);
   }
   fclose(fd);
-
-
+  
   /* Now we can begin the main algorithm */
-  unsigned int t = bt-1;
+  int t = bt-1;
 
   while (t >= 0){
-    for (unsigned int k = 0; k < space; k++){
+    printf("t=%u\n", t);
+    for (unsigned int k = 0; k < space; k++){ /* We explore all states */
       W& w = w_set[k];
 
-      for (unsigned int i = 0; i <= v_max; i++){
-	
+      for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
+	double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, opt, distribution, h, t);
+	unsigned int p = v_max;
+
+	for (unsigned int j = 0; j < v_max; j++){
+	  if (j >= w.get(1)){
+	    double co = f(i,j,t) + c(j) + compute_sum(w, d, s, j, opt, distribution, h, t);
+	    if (co < cost){
+	      cost = co;
+	      p = j;
+	    }
+	  }
+	}
+	unsigned int id = h[w];
+	opt[t][id][i] = cost;
+	pol[t][id][i] = p;
       }
     }
+    t--;
   }
+
+  /* Output best policies array */
   
   return 0;
 }
 
+double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W,unsigned int> &h, unsigned int t){
+  w.inc_time(v);
+  unsigned int id_w = h[w];
+  double sum = 0;
 
+  for (unsigned int i = 0; i <= s; i++){
+    W wp = w;
+    for (unsigned int j = 1; j <= d; j++){
+      unsigned int k = d-j+1;
+      wp.set(k, wp.get(k)+s);
+      sum += distribution[id_w][k-1][i] * opt[t+1][h[wp]][v];
+    }
+  }
+
+  return sum;
+}
