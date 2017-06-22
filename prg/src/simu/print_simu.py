@@ -19,6 +19,7 @@ t = len(num[0])
 x = np.linspace(0, t-1, t)
 
 plt.xlim(0,t)
-plt.plot(x, num[0])
-plt.step(x, num[1], where ='post')
-plt.show()
+for i in range(int(len(num)/2)):
+    plt.plot(x, num[2*i])
+    plt.step(x, num[2*i+1], where ='post')
+    plt.show()

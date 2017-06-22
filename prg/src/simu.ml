@@ -26,9 +26,9 @@ let rand_couple d s id_w distribution =
 (* MAIN FUNCTION *)
 
 let () =
-  if Array.length Sys.argv < 6 then
+  if Array.length Sys.argv < 7 then
     begin
-      Printf.printf "Use: %s T v_max distribution_file policies_file output_file options\n" Sys.argv.(0);
+      Printf.printf "Use: %s T v_max distribution_file policies_file output_file nb_simulations options\n" Sys.argv.(0);
       exit 1
     end
   else
@@ -49,6 +49,7 @@ let () =
   let (d,s) = Scanf.bscanf dist "%d %d\n" (fun x y -> (x,y)) in
   let space = S.state_space d s in
   let h = Hashtbl.create space in
+  let nb_simulations = int_of_string Sys.argv.(6) in
 
   let distribution = Array.make_matrix space d [||] in
   for i=0 to space-1 do
@@ -90,38 +91,40 @@ let () =
   close_in dist';
 
   (* The simulation starts here *)
-  
-  let w = S.new_w d in
-  let speeds = Array.make bt 0 in
-  let last_speed = ref 0 in
-  let work_t = Array.make (bt+1) 0 in
-
-  for i=0 to bt-1 do
-    let (delta, sigma) = rand_couple d s (Hashtbl.find h w) distribution in
-    update_d work_t i delta sigma;
-    S.add_work w delta sigma;
-    speeds.(i) <- pol.(i).(Hashtbl.find h w).(!last_speed);
-    last_speed := speeds.(i);
-    S.inc_time w !last_speed
-  done;
-
-  (* Write the results in a file *)
-
-  for i=1 to bt -1 do
-    speeds.(i) <- speeds.(i) + speeds.(i-1) (* We want the cumulated speeds *)
-  done;
-
   let fd = open_out Sys.argv.(5) in
-  Printf.fprintf fd "0 ";
-  for i=0 to bt -2 do
-    Printf.fprintf fd "%d " speeds.(i)
+
+  for simu=1 to nb_simulations do
+    let w = S.new_w d in
+    let speeds = Array.make bt 0 in
+    let last_speed = ref 0 in
+    let work_t = Array.make (bt+1) 0 in
+
+    for i=0 to bt-1 do
+      let (delta, sigma) = rand_couple d s (Hashtbl.find h w) distribution in
+      update_d work_t i delta sigma;
+      S.add_work w delta sigma;
+      speeds.(i) <- pol.(i).(Hashtbl.find h w).(!last_speed);
+      last_speed := speeds.(i);
+      S.inc_time w !last_speed
+    done;
+
+    (* Write the results in a file *)
+
+    for i=1 to bt -1 do
+      speeds.(i) <- speeds.(i) + speeds.(i-1) (* We want the cumulated speeds *)
+    done;
+
+    Printf.fprintf fd "0 ";
+    for i=0 to bt -2 do
+      Printf.fprintf fd "%d " speeds.(i)
+    done;
+    Printf.fprintf fd "%d\n" speeds.(bt-1);
+    
+    for i=0 to bt -1 do
+      Printf.fprintf fd "%d " work_t.(i)
+    done;
+    Printf.fprintf fd "%d\n" work_t.(bt);
   done;
-  Printf.fprintf fd "%d\n" speeds.(bt-1);
-  
-  for i=0 to bt -1 do
-    Printf.fprintf fd "%d " work_t.(i)
-  done;
-  Printf.fprintf fd "%d\n" work_t.(bt);
 
   close_out fd;
   ()
