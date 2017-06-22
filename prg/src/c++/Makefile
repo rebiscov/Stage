@@ -7,6 +7,8 @@ clemacs:
 
 clean:
 	rm *.o
+mrproper:
+	rm *.o
 	rm main
 
 
