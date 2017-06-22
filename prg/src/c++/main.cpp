@@ -80,7 +80,6 @@ int main(int argc, char* argv[]){
   int t = bt-1;
 
   while (t >= 0){
-    printf("t=%u\n", t);
     for (unsigned int k = 0; k < space; k++){ /* We explore all states */
       W& w = w_set[k];
 
@@ -106,6 +105,24 @@ int main(int argc, char* argv[]){
   }
 
   /* Output best policies array */
+  fd = NULL;
+  fd = fopen(argv[4], "w");
+  if (fd == NULL){
+    perror("fopen");
+    exit(EXIT_FAILURE);
+  }
+
+  for (unsigned int i = 0; i <= bt; i++)
+    for (unsigned int j = 0; j < space; j++)
+      for (unsigned int k = 0; k <= v_max; k++)
+	if (j == space-1 && k == v_max)
+	  fprintf(fd, "%d\n", pol[i][j][k]);
+	else
+	  fprintf(fd, "%d ", pol[i][j][k]);
+
+  fclose(fd);
+
+  printf("Bye!\n");
   
   return 0;
 }
