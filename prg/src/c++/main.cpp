@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <thread>
+#include <cstring>
 #include "states.hpp"
 #include "funs.hpp"
 #include "math.hpp"
@@ -18,12 +19,16 @@ void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, uns
 /* MAIN FUNCTION */
 
 int main(int argc, char* argv[]){
+  bool debug;
   printf("DP algorithm, C++ first version\n");
 
   if (argc < 5 ){
     printf("Use: %s T v_max distribution_file out_file options\n", argv[0]);
     exit(EXIT_FAILURE);
   }
+  if (argc >= 6)
+    debug = strcmp("d", argv[5]) == 0;
+  
 
   /* I define all the important variables, I extract the distribution in the file given by the user and I initialize the array J_t^v */
 
@@ -58,7 +63,13 @@ int main(int argc, char* argv[]){
     for (unsigned int j = 0; j < d; j++)
       distribution[i][j] = std::vector<double>(s+1, 0);
 
+  if (debug)
+    printf("COMPUTE W set...");
+  
   std::vector<W> w_set = compute_w(d, s);
+
+  if (debug)
+    printf("done.\n");  
 
   std::vector<std::vector<std::vector<unsigned int>>> pol(bt+1, std::vector<std::vector<unsigned int>>(space));
   
@@ -73,18 +84,26 @@ int main(int argc, char* argv[]){
       opt[i][j] = std::vector<double>(v_max+1, 0.);
 
   /* Extracting the distribution from the file and giving a number to each of the w */
+  if (debug)
+    printf("Loading distribution... ");
+  
   for (unsigned int k = 0; k < space; k++){
     h[w_set[k]] = k;
     for (unsigned int i = 1; i <= d; i++)
       for (unsigned int j = 0; j <= s; j++)
 	fscanf(fd, "%f", &distribution[k][i-1][j]);
   }
+
+  if (debug)
+    printf("done.\n");
   fclose(fd);
   
   /* Now we can begin the main algorithm */
   int t = bt-1;
 
   while (t >= 0){
+    if (debug)
+      printf("COMPUTATION: t = %d\n", t);
     std::vector<std::thread> threads;    
     for (unsigned int k = 0; k < NB_THREADS; k++)
       threads.push_back(std::thread (compute_j, &w_set, k, d, s, v_max, space, &opt, &pol, &distribution, &h, t));
