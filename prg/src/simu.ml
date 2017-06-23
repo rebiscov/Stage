@@ -101,7 +101,6 @@ let () =
     let work_t = Array.make (bt+1) 0 in
 
     for i=0 to bt-1 do
-      Printf.printf "t=%d\n" i;
       let (delta, sigma) = rand_couple d s (Hashtbl.find h w) distribution in
       update_d work_t i delta sigma;
       S.add_work w delta sigma;
