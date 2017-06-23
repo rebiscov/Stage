@@ -5,4 +5,4 @@ let f v1 v2 t=
     0.
 
 let c v =
-  exp (exp (float_of_int (v*v)))
+  exp (float_of_int v)
