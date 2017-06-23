@@ -169,7 +169,7 @@ double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vec
     W wp = w;
     for (unsigned int j = 1; j <= d; j++){
       unsigned int k = d-j+1;
-      wp.set(k, wp.get(k)+s);
+      wp.set(k, wp.get(k)+i);
       sum += distribution[id_w][k-1][i] * opt[t+1][h[wp]][v];
     }
   }
