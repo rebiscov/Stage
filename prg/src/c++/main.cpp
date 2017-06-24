@@ -91,7 +91,7 @@ int main(int argc, char* argv[]){
     h[w_set[k]] = k;
     for (unsigned int i = 1; i <= d; i++)
       for (unsigned int j = 0; j <= s; j++)
-	fscanf(fd, "%f", &distribution[k][i-1][j]);
+	fscanf(fd, "%lf", &distribution[k][i-1][j]);
   }
 
   if (debug)
