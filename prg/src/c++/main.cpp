@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 #include <vector>
 #include <map>
 #include <thread>
@@ -129,14 +130,17 @@ int main(int argc, char* argv[]){
 	  fprintf(fd, "%d ", pol[i][j][k]);
 
   fclose(fd);
-
+  
   printf("Bye!\n");
   
   return 0;
 }
 
 void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::map<W,unsigned int> *h, unsigned int t){
-  for (unsigned int k = id_thread*(space/NB_THREADS); k < min((id_thread+1)*(space/NB_THREADS), space); k++){ /* We explore all states */
+  unsigned int minimum = (id_thread+1)*(space/NB_THREADS);
+  if (id_thread == NB_THREADS -1)
+    minimum = space;
+  for (unsigned int k = id_thread*(space/NB_THREADS); k < minimum; k++){ /* We explore all states */
     W& w = (*w_set)[k];
 
     for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
