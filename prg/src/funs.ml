@@ -5,4 +5,4 @@ let f v1 v2 t=
     0.
 
 let c v =
-  float_of_int (v*v)
+  float_of_int (v*v*v)

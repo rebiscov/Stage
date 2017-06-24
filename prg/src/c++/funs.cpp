@@ -10,5 +10,5 @@ double f (unsigned int v1, unsigned int v2, unsigned int t){
 
 
 double c(unsigned int v){
-  return (double)(v*v);
+  return (double)(v*v*v);
 }
