@@ -15,7 +15,8 @@ class W{
   bool is_null(void);
   void add_work(unsigned int delta, unsigned int sigma);
   void print_w(void);
-  unsigned int get(unsigned int i);
+  unsigned int get(unsigned int i) const;
+  unsigned int size(void) const;
   void add(unsigned int i, unsigned int e);
   void inc_time(unsigned int v);
   void set(unsigned int x, unsigned int e);
@@ -31,9 +32,14 @@ namespace std {
   template <>
   struct hash<W>
   {
-    std::size_t operator()(const W& w) const
+    std::size_t operator()(const W& obj) const
     {
-      return (std::size_t)0;
+      unsigned int hash = 0;
+      for (unsigned int i = 1; i <= obj.size(); i++){
+	hash *= 37;
+	hash += obj.get(i);
+      }
+      return (std::size_t)hash;
     }
   };
 }

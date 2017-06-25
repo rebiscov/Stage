@@ -51,11 +51,15 @@ void W::print_w(void){
   std::cout << w.back() << std::endl;
 }
 
-unsigned int W::get(unsigned int i){
+unsigned int W::get(unsigned int i) const {
   if (i == 0)
     return 0;
   else
     return w[i-1];
+}
+
+unsigned int W::size(void) const{
+  return w.size();
 }
 
 void W::add(unsigned int i, unsigned int e){
