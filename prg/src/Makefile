@@ -8,3 +8,5 @@ tool: toolkit.ml
 	ocamlbuild toolkit.native
 simu:
 	ocamlbuild -pkg unix simu.native
+perf:
+	ocamlbuild perf.native
