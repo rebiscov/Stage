@@ -56,7 +56,7 @@ int main(int argc, char* argv[]){
   }
 
   /* Defining the hashtable, the distribution, the w_set, the best policies array and the array of the expected consumption */
-  std::unordered_map<W, unsigned int> h;
+  std::unordered_map<W, unsigned int> h(space);
 
   std::vector<std::vector<std::vector<double>>> distribution(space,std::vector<std::vector<double>>(d));
 
