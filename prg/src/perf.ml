@@ -12,12 +12,16 @@ let () =
   let (d, s) = (int_of_string Sys.argv.(1), int_of_string Sys.argv.(2)) in
   let space = S.state_space d s in
 
+  let t1 = Sys.time() in
+
   let h = Hashtbl.create space in
   let w_set = S.compute_w d s in
 
   for k=0 to space-1 do
     Hashtbl.add h w_set.(k) k;
   done;
+
+  let t2 = Sys.time() in
 
   let a = ref 56 in
 
@@ -27,4 +31,8 @@ let () =
       a := key
   done;
 
+  let t3 = Sys.time() in
+
+  printf "Time to compute w_set and the hashtable: %f\n" (t2-.t1);
+  printf "Time to access all the elements of the hashtable %f\n" (t3-.t2);
   ()
