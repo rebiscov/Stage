@@ -17,6 +17,13 @@ void W::operator=(W obj){
   w = obj.w;
 }
 
+bool W::operator==(const W& obj) const{
+  for (unsigned int i = 0; i < w.size(); i++)
+    if (w[i] != obj.w[i])
+      return false;
+  return true;
+}
+
 bool W::operator<(const W& obj) const{
   unsigned int d = w.size();
   for (unsigned int i = 0; i < d; i++)

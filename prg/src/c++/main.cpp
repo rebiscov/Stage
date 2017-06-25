@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <thread>
 #include <cstring>
 #include "states.hpp"
@@ -13,9 +13,9 @@
 
 /* some prototypes */
 
-double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W, unsigned int> &h, unsigned int t);
+double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::unordered_map<W, unsigned int> &h, unsigned int t);
 
-void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::map<W,unsigned int> *h, unsigned int t);
+void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t);
 
 /* MAIN FUNCTION */
 
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]){
   }
 
   /* Defining the hashtable, the distribution, the w_set, the best policies array and the array of the expected consumption */
-  std::map<W, unsigned int> h;
+  std::unordered_map<W, unsigned int> h;
 
   std::vector<std::vector<std::vector<double>>> distribution(space,std::vector<std::vector<double>>(d));
 
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
-void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::map<W,unsigned int> *h, unsigned int t){
+void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t){
   unsigned int minimum = (id_thread+1)*(space/NB_THREADS);
   if (id_thread == NB_THREADS -1)
     minimum = space;
@@ -164,7 +164,7 @@ void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, uns
 }
 
 
-double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::map<W,unsigned int> &h, unsigned int t){
+double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::unordered_map<W,unsigned int> &h, unsigned int t){
   w.inc_time(v);
   unsigned int id_w = h[w];
   double sum = 0;

@@ -10,6 +10,7 @@ class W{
   W(unsigned int d);
   unsigned int& operator[](unsigned int i);
   void operator=(W obj);
+  bool operator==(const W& obj) const;  
   bool operator<(const W& obj) const;
   bool is_null(void);
   void add_work(unsigned int delta, unsigned int sigma);
@@ -25,5 +26,16 @@ class W{
 
 std::vector<W> compute_w(unsigned int d, unsigned int s);
 unsigned int state_space(unsigned int d, unsigned int s);
+
+namespace std {
+  template <>
+  struct hash<W>
+  {
+    std::size_t operator()(const W& w) const
+    {
+      return (std::size_t)0;
+    }
+  };
+}
 
 #endif
