@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
   t1 = clock();
 
   std::unordered_map<W, unsigned int> h(space);
-  std::vector<W> w_set = compute_w(d, s);
+  W *w_set = compute_w(d, s);
 
   for (unsigned int k = 0; k < space; k++)
     h[w_set[k]] = k;
