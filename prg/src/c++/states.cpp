@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include "math.hpp"
 #include "states.hpp"
 
@@ -103,7 +102,7 @@ unsigned int state_space(unsigned int d, unsigned int s){
 }
 
 
-void compute_w_i(std::vector<W>& w_set, W w, unsigned int d, unsigned int s, unsigned int sigma_i, unsigned int i, unsigned int &index){
+void compute_w_i(W* w_set, W w, unsigned int d, unsigned int s, unsigned int sigma_i, unsigned int i, unsigned int &index){
   if (i >= d){
     w_set[index] = w;
     index++;
@@ -115,9 +114,15 @@ void compute_w_i(std::vector<W>& w_set, W w, unsigned int d, unsigned int s, uns
     }
 }
 
-std::vector<W> compute_w(unsigned int d, unsigned int s){
+W* compute_w(unsigned int d, unsigned int s){
   unsigned int space = state_space(d, s), index = 0;
-  std::vector<W> w_set(space);
+  W* w_set = NULL;
+  w_set = new W[space];
+  if  (w_set == NULL){
+    printf("Error: memory allocation for w_set did not work!\n");
+    exit(1);
+  }
+  
   W w(d);
 
   compute_w_i(w_set, w, d, s, 0, 0, index);

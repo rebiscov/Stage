@@ -15,7 +15,7 @@
 
 double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, std::vector<std::vector<std::vector<double>>> &opt, std::vector<std::vector<std::vector<double>>> &distribution, std::unordered_map<W, unsigned int> &h, unsigned int t);
 
-void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t);
+void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t);
 
 /* MAIN FUNCTION */
 
@@ -67,7 +67,12 @@ int main(int argc, char* argv[]){
   if (debug)
     printf("COMPUTE W set...");
   
-  std::vector<W> w_set = compute_w(d, s);
+  W *w_set = NULL;
+  w_set = compute_w(d, s);
+  if (w_set == NULL){
+    printf("Error: memory allocation for w_set did not work!\n");
+    exit(1);
+  }
 
   if (debug)
     printf("done.\n");  
@@ -107,7 +112,7 @@ int main(int argc, char* argv[]){
       printf("COMPUTATION: t = %d\n", t);
     std::vector<std::thread> threads;    
     for (unsigned int k = 0; k < NB_THREADS; k++)
-      threads.push_back(std::thread (compute_j, &w_set, k, d, s, v_max, space, &opt, &pol, &distribution, &h, t));
+      threads.push_back(std::thread (compute_j, w_set, k, d, s, v_max, space, &opt, &pol, &distribution, &h, t));
     for (unsigned int k = 0; k < NB_THREADS; k++)
       threads[k].join();
     t--;
@@ -136,12 +141,12 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
-void compute_j(std::vector<W> *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t){
+void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, std::vector<std::vector<std::vector<double>>> *opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t){
   unsigned int minimum = (id_thread+1)*(space/NB_THREADS);
   if (id_thread == NB_THREADS -1)
     minimum = space;
   for (unsigned int k = id_thread*(space/NB_THREADS); k < minimum; k++){ /* We explore all states */
-    W& w = (*w_set)[k];
+    W& w = w_set[k];
 
     for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
       double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, *opt, *distribution, *h, t);

@@ -1,5 +1,3 @@
-#include <vector>
-
 #ifndef W_CLASS
 #define W_CLASS
 
@@ -27,7 +25,7 @@ class W{
   unsigned int m_d;
 };
 
-std::vector<W> compute_w(unsigned int d, unsigned int s);
+W* compute_w(unsigned int d, unsigned int s);
 unsigned int state_space(unsigned int d, unsigned int s);
 
 namespace std {
