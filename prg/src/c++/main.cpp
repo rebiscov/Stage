@@ -9,7 +9,7 @@
 #include "funs.hpp"
 #include "math.hpp"
 
-#define NB_THREADS 4
+#define NB_THREADS 1
 
 /* some prototypes */
 
