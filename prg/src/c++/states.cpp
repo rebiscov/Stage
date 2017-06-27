@@ -3,7 +3,7 @@
 #include "math.hpp"
 #include "states.hpp"
 
-W::W(void){
+W::W(void): w(NULL), m_d(0){
 }
 
 W::W(unsigned int d): m_d(d){
@@ -15,6 +15,9 @@ unsigned int& W::operator[](unsigned int i){
 }
 
 void W::operator=(W obj){
+  if (m_d != 0)
+    delete[] w;
+  w = new unsigned int[obj.m_d];
   m_d = obj.m_d;
   for (unsigned int i = 0; i < m_d; i++)
     w[i] = obj[i];
