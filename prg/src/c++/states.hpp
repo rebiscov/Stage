@@ -8,6 +8,7 @@ class W{
   
   W();
   W(unsigned int d);
+  W(const W& obj);
   unsigned int& operator[](unsigned int i);
   void operator=(W obj);
   bool operator==(const W& obj) const;  

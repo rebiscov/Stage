@@ -10,6 +10,13 @@ W::W(unsigned int d): m_d(d){
   w = new unsigned int[d];
 }
 
+W::W(const W& obj){
+  m_d = obj.m_d;
+  w = new unsigned int[m_d];
+  for (unsigned int i = 0; i < m_d; i++)
+    w[i] = obj.w[i];
+}
+
 unsigned int& W::operator[](unsigned int i){
   return w[i];
 }
