@@ -13,9 +13,9 @@
 
 /* some prototypes */
 
-double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double ***opt, std::vector<std::vector<std::vector<double>>> &distribution, std::unordered_map<W, unsigned int> &h, unsigned int t);
+double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double ***opt, double ***distribution, std::unordered_map<W, unsigned int> &h, unsigned int t);
 
-void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double ***opt, unsigned int ***pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t);
+void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double ***opt, unsigned int ***pol, double ***distribution, std::unordered_map<W,unsigned int> *h, unsigned int t);
 
 /* MAIN FUNCTION */
 
@@ -58,11 +58,15 @@ int main(int argc, char* argv[]){
   /* Defining the hashtable, the distribution, the w_set, the best policies array and the array of the expected consumption */
   std::unordered_map<W, unsigned int> h(space);
 
-  std::vector<std::vector<std::vector<double>>> distribution(space,std::vector<std::vector<double>>(d));
+  double ***distribution = NULL;
 
-  for (unsigned int i = 0; i < space; i++)
+  distribution = new double**[space];
+
+  for (unsigned int i = 0; i < space; i++){
+    distribution[i] = new double*[d];
     for (unsigned int j = 0; j < d; j++)
-      distribution[i][j] = std::vector<double>(s+1, 0);
+      distribution[i][j] = new double[s+1];
+  }
 
   if (debug)
     printf("COMPUTE W set...");
@@ -127,7 +131,7 @@ int main(int argc, char* argv[]){
       printf("COMPUTATION: t = %d\n", t);
     std::vector<std::thread> threads;    
     for (unsigned int k = 0; k < NB_THREADS; k++)
-      threads.push_back(std::thread (compute_j, w_set, k, d, s, v_max, space, opt, pol, &distribution, &h, t));
+      threads.push_back(std::thread (compute_j, w_set, k, d, s, v_max, space, opt, pol, distribution, &h, t));
     for (unsigned int k = 0; k < NB_THREADS; k++)
       threads[k].join();
     t--;
@@ -156,7 +160,7 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
-void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double ***opt, unsigned int ***pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t){
+void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double ***opt, unsigned int ***pol, double ***distribution, std::unordered_map<W,unsigned int> *h, unsigned int t){
   unsigned int minimum = (id_thread+1)*(space/NB_THREADS);
   if (id_thread == NB_THREADS -1)
     minimum = space;
@@ -164,12 +168,12 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
     W& w = w_set[k];
 
     for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
-      double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, opt, *distribution, *h, t);
+      double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, opt, distribution, *h, t);
       unsigned int p = v_max;
 
       for (unsigned int j = 0; j < v_max; j++){
 	if (j >= w.get(1)){
-	  double co = f(i,j,t) + c(j) + compute_sum(w, d, s, j, opt, *distribution, *h, t);
+	  double co = f(i,j,t) + c(j) + compute_sum(w, d, s, j, opt, distribution, *h, t);
 	  if (co < cost){
 	    cost = co;
 	    p = j;
@@ -184,7 +188,7 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
 }
 
 
-double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double ***opt, std::vector<std::vector<std::vector<double>>> &distribution, std::unordered_map<W,unsigned int> &h, unsigned int t){
+double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double ***opt, double ***distribution, std::unordered_map<W,unsigned int> &h, unsigned int t){
   w.inc_time(v);
   unsigned int id_w = h[w];
   double sum = 0;
