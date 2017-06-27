@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
-#include <vector>
 #include <unordered_map>
 #include <thread>
 #include <cstring>
@@ -9,7 +8,7 @@
 #include "funs.hpp"
 #include "math.hpp"
 
-#define NB_THREADS 1
+#define NB_THREADS 4
 
 /* some prototypes */
 
@@ -126,12 +125,13 @@ int main(int argc, char* argv[]){
   /* Now we can begin the main algorithm */
   int t = bt-1;
 
+  std::thread threads[NB_THREADS];
+  
   while (t >= 0){
     if (debug)
       printf("COMPUTATION: t = %d\n", t);
-    std::vector<std::thread> threads;    
     for (unsigned int k = 0; k < NB_THREADS; k++)
-      threads.push_back(std::thread (compute_j, w_set, k, d, s, v_max, space, opt, pol, distribution, &h, t));
+      threads[k] = std::thread (compute_j, w_set, k, d, s, v_max, space, opt, pol, distribution, &h, t);
     for (unsigned int k = 0; k < NB_THREADS; k++)
       threads[k].join();
     t--;
