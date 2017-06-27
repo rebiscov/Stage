@@ -20,7 +20,7 @@ void W::operator=(W obj){
   w = new unsigned int[obj.m_d];
   m_d = obj.m_d;
   for (unsigned int i = 0; i < m_d; i++)
-    w[i] = obj[i];
+    w[i] = obj.w[i];
 }
 
 bool W::operator==(const W& obj) const{
