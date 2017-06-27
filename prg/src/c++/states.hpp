@@ -22,7 +22,8 @@ class W{
   void set(unsigned int x, unsigned int e);
 
  private:
-  std::vector<unsigned int> w;
+  unsigned int* w;
+  unsigned int m_d;
 };
 
 std::vector<W> compute_w(unsigned int d, unsigned int s);

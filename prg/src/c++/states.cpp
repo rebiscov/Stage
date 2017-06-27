@@ -6,7 +6,8 @@
 W::W(void){
 }
 
-W::W(unsigned int d): w(std::vector<unsigned int>(d,0)){
+W::W(unsigned int d): m_d(d){
+  w = new unsigned int[d];
 }
 
 unsigned int& W::operator[](unsigned int i){
@@ -14,18 +15,20 @@ unsigned int& W::operator[](unsigned int i){
 }
 
 void W::operator=(W obj){
-  w = obj.w;
+  m_d = obj.m_d;
+  for (unsigned int i = 0; i < m_d; i++)
+    w[i] = obj[i];
 }
 
 bool W::operator==(const W& obj) const{
-  for (unsigned int i = 0; i < w.size(); i++)
+  for (unsigned int i = 0; i < m_d; i++)
     if (w[i] != obj.w[i])
       return false;
   return true;
 }
 
 bool W::operator<(const W& obj) const{
-  unsigned int d = w.size();
+  unsigned int d = m_d;
   for (unsigned int i = 0; i < d; i++)
     if (w[i] != obj.w[i])
       return w[i] < obj.w[i];
@@ -33,22 +36,22 @@ bool W::operator<(const W& obj) const{
 }
 
 bool W::is_null(void){
-  for (unsigned int i = 0; i < w.size(); i++)
+  for (unsigned int i = 0; i < m_d; i++)
     if (w[i] != 0)
       return false;
   return true;
 }
 
 void W::add_work(unsigned int delta, unsigned int sigma){
-  for (unsigned int i = delta-1; i < w.size(); i++)
+  for (unsigned int i = delta-1; i < m_d; i++)
     w[i] += sigma;
 }
 
 
 void W::print_w(void){
-  for (unsigned int i = 0; i < w.size()-1; i++)
+  for (unsigned int i = 0; i < m_d-1; i++)
     std::cout << w[i] << " ";
-  std::cout << w.back() << std::endl;
+  std::cout << w[m_d-1] << std::endl;
 }
 
 unsigned int W::get(unsigned int i) const {
@@ -59,25 +62,25 @@ unsigned int W::get(unsigned int i) const {
 }
 
 unsigned int W::size(void) const{
-  return w.size();
+  return m_d;
 }
 
 void W::add(unsigned int i, unsigned int e){
-  unsigned int d = w.size();
+  unsigned int d = m_d;
 
   for (unsigned int j = i-1; j < d; j++)
     w[j] += e;
 }
 
 void W::inc_time(unsigned int v){
-  unsigned int d = w.size();
+  unsigned int d = m_d;
   for (unsigned int i = 0; i < d-1; i++)
     w[i] = minus(w[i+1], v);
   w[d-1] = w[d-2];
 }
 
 void W::set(unsigned int x, unsigned int e){
-  unsigned int d = w.size();
+  unsigned int d = m_d;
 
   w[x-1] = e;
   if ((x < d && w[x] < w[x-1]) || (x > 1 && w[x-2] > w[x-1])){
