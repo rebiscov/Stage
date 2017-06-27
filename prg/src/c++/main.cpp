@@ -15,7 +15,7 @@
 
 double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double ***opt, std::vector<std::vector<std::vector<double>>> &distribution, std::unordered_map<W, unsigned int> &h, unsigned int t);
 
-void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double ***opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t);
+void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double ***opt, unsigned int ***pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t);
 
 /* MAIN FUNCTION */
 
@@ -77,11 +77,19 @@ int main(int argc, char* argv[]){
   if (debug)
     printf("done.\n");  
 
-  std::vector<std::vector<std::vector<unsigned int>>> pol(bt+1, std::vector<std::vector<unsigned int>>(space));
-  
-  for (unsigned int i = 0; i <= bt; i++)
+  unsigned int ***pol = NULL;
+  pol = new unsigned int**[bt+1];
+  if (pol == NULL){
+    printf("Error: memory allocation for pol did not work!\n");
+    exit(1);
+  }
+
+  for (unsigned int i = 0; i <= bt; i++){
+    pol[i] = new unsigned int*[space];
     for (unsigned int j = 0; j < space; j++)
-      pol[i][j] = std::vector<unsigned int>(v_max+1, 0);
+      pol[i][j] = new unsigned int[v_max+1];
+  }
+    
   
   double ***opt = NULL;
   opt = new double**[bt+1];
@@ -119,7 +127,7 @@ int main(int argc, char* argv[]){
       printf("COMPUTATION: t = %d\n", t);
     std::vector<std::thread> threads;    
     for (unsigned int k = 0; k < NB_THREADS; k++)
-      threads.push_back(std::thread (compute_j, w_set, k, d, s, v_max, space, opt, &pol, &distribution, &h, t));
+      threads.push_back(std::thread (compute_j, w_set, k, d, s, v_max, space, opt, pol, &distribution, &h, t));
     for (unsigned int k = 0; k < NB_THREADS; k++)
       threads[k].join();
     t--;
@@ -148,7 +156,7 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
-void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double ***opt, std::vector<std::vector<std::vector<unsigned int>>> *pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t){
+void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double ***opt, unsigned int ***pol, std::vector<std::vector<std::vector<double>>> *distribution, std::unordered_map<W,unsigned int> *h, unsigned int t){
   unsigned int minimum = (id_thread+1)*(space/NB_THREADS);
   if (id_thread == NB_THREADS -1)
     minimum = space;
@@ -170,7 +178,7 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
       }
       unsigned int id = (*h)[w];
       opt[t][id][i] = cost;
-      (*pol)[t][id][i] = p;
+      pol[t][id][i] = p;
     }
   }
 }
