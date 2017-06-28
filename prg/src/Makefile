@@ -1,12 +1,27 @@
-all:
-	ocamlbuild main.native
+CC = ocamlbuild
+
+all: main.native
+
+main.native: main.ml
+	$(CC) main.native
+
 clean:
-	ocamlbuild -clean
+	$(CC) -clean
+
 clemacs:
 	rm *~
-tool: toolkit.ml
-	ocamlbuild toolkit.native
-simu:
-	ocamlbuild -pkg unix simu.native
-perf:
-	ocamlbuild perf.native
+
+tool: tool.native
+
+tool.native: toolkit.ml
+	$(CC) toolkit.native
+
+simu: simu.native
+
+simu.native: simu.ml
+	$(CC) -pkg unix simu.native
+
+perf: perf.native
+
+perf.native: perf.ml
+	$(CC) perf.native
