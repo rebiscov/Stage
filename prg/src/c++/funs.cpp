@@ -1,21 +1,22 @@
 #include <cmath>
-#include <algorithm>
+#include <cstdio>
 #include "funs.hpp"
-
-#define delta 0.1
+#include "math.hpp"
 
 double c(unsigned int v){
   return (double)(v*v*v);
 }
 
 double f (unsigned int v1, unsigned int v2, unsigned int t){
-  if (t == 0 || v1 == v2)
+  double delta = 0.1;
+  if (t == 0 || v1 == v2 || v1 == 0 || v2 == 0)
     return 0;
   else{
-    unsigned int v_min = std::min(v1,v2);
-    unsigned int v_max = std::max(v1,v2);
-    double delta_1 = (delta*(double)v_min) / (double)std::abs((long)(v1-v2));
+    unsigned int v_min = min(v1, v2);
+    unsigned int v_max = max(v1,v2);
+    double delta_1 = (double)(delta*(double)v_min) / (double)(v_max-v_min);
+    double res = delta_1*c(v_max) - (delta + delta_1)*c(v_min);
     
-    return delta_1*(double)c(v_max)* - (delta + delta_1)*(double)c(v_min);
+    return res;
   }
 }
