@@ -1,16 +1,23 @@
-all:
-	g++ -std=c++11 -c math.cpp states.cpp funs.cpp main.cpp -pthread
-	g++ -std=c++11 -o main math.o states.o main.o funs.o -pthread
+CC=g++
+FLAGS=-pthread -std=c++11
 
-perf:
-	g++ -std=c++11 -c math.cpp states.cpp funs.cpp perf.cpp -pthread
-	g++ -std=c++11 -o perf math.o states.o perf.o funs.o -pthread
+all: main
+
+main: math.o funs.o states.o main.o
+	$(CC) $(FLAGS) -o main math.o states.o funs.o main.o
+
+perf: math.o funs.o states.o perf.o
+	$(CC) $(FLAGS) -o perf math.o states.o funs.o perf.o
+
+%.o: %.c
+	$(CC) $(FLAGS) -c %.c
 
 clemacs:
 	rm *~
 
 clean:
 	rm *.o
+
 mrproper:
 	rm *.o
 	rm main
