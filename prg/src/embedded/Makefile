@@ -1,7 +1,7 @@
 CC=g++
 FLAGS=-std=c++11 -pthread
 
-all: client serveur
+all: client server
 
 client: math.o states.o client.o
 	$(CC) $(FLAGS) -o client math.o states.o client.o
