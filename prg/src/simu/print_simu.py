@@ -13,13 +13,24 @@ with open(sys.argv[1]) as file:
 
 num = []
 for line in lines:
-    num.append(list(map(int,line.split())))
+    num.append(list(map(float,line.split())))
 
-t = len(num[0])
+t = len(num[1])
 x = np.linspace(0, t-1, t)
 
+avg_cost=0.
+avg_changes=0
+
 plt.xlim(0,t)
-for i in range(int(len(num)/2)):
-    plt.plot(x, num[2*i])
-    plt.step(x, num[2*i+1], where ='post')
+for i in range(int(len(num)/3)):
+    changes=int(num[3*i][1])
+    cost=num[3*i][0]
+    avg_cost += cost
+    avg_changes += changes
+    plt.title('Cost: ' + str(cost) + ', number of changes: ' + str(changes) + '.')
+    plt.plot(x, num[3*i+1])
+    plt.step(x, num[3*i+2], where ='post')
     plt.show()
+
+n = len(num)/3
+print('Average cost = ' + str(avg_cost/n) + ', average number of changes = ' + str(avg_changes/n))
