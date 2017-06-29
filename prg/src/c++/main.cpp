@@ -173,7 +173,10 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
 
       for (unsigned int j = 0; j < v_max; j++){
 	if (j >= w.get(1)){
-	  double co = f(i,j,t) + c(j) + compute_sum(w, d, s, j, opt, distribution, *h, t);
+	  double c_j = c(j);
+	  if (c_j >= cost)
+	    break;
+	  double co = f(i,j,t) + c_j + compute_sum(w, d, s, j, opt, distribution, *h, t);
 	  if (co < cost){
 	    cost = co;
 	    p = j;
