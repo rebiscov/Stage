@@ -98,6 +98,8 @@ let () =
     let w = S.new_w d in
     let speeds = Array.make bt 0 in
     let last_speed = ref 0 in
+    let cost = ref 0. in
+    let change_speed = ref 0 in
     let work_t = Array.make (bt+1) 0 in
 
     for i=0 to bt-1 do
@@ -105,6 +107,9 @@ let () =
       update_d work_t i delta sigma;
       S.add_work w delta sigma;
       speeds.(i) <- pol.(i).(Hashtbl.find h w).(!last_speed);
+      cost := (Funs.c speeds.(i)) +. (Funs.f !last_speed speeds.(i) i) +. !cost;
+      if speeds.(i) <> !last_speed && i > 0 then
+        change_speed := !change_speed + 1;
       last_speed := speeds.(i);
       S.inc_time w !last_speed
     done;
@@ -115,6 +120,8 @@ let () =
       speeds.(i) <- speeds.(i) + speeds.(i-1) (* We want the cumulated speeds *)
     done;
 
+    Printf.fprintf fd "%f %d\n" !cost !change_speed;
+    
     Printf.fprintf fd "0 ";
     for i=0 to bt -2 do
       Printf.fprintf fd "%d " speeds.(i)
