@@ -10,5 +10,5 @@ let f v1 v2 t =
       let v_min = min v1 v2 in
       let v_max = max v1 v2 in
       let delta_1 = (delta*.(float_of_int v_min)) /. ( float_of_int (v_max-v_min)) in
-      delta *. (c v_max) -. (delta +. delta_1)*.(c v_min)
+      delta *. (c v_max) -. (delta +. delta_1)*.(c v_min) +. delta *. (float_of_int (v1 + v2)) /. 2.
     end

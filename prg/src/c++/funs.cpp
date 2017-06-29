@@ -15,7 +15,7 @@ double f (unsigned int v1, unsigned int v2, unsigned int t){
     unsigned int v_min = min(v1, v2);
     unsigned int v_max = max(v1,v2);
     double delta_1 = (double)(delta*(double)v_min) / (double)(v_max-v_min);
-    double res = delta_1*c(v_max) - (delta + delta_1)*c(v_min);
+    double res = delta_1*c(v_max) - (delta + delta_1)*c(v_min) + delta*(double)(v1+v2)/2;
     
     return res;
   }
