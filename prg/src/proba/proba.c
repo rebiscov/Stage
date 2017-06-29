@@ -40,6 +40,7 @@ int main(int argc, char *argv[]){
     break;
   case 1:
     uniform_distribution(d, s, fd);
+    break;
   default:
     exit(1);
   }
