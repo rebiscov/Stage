@@ -15,8 +15,13 @@
 #define THRESHOLD 0.1
 #define ERROR 0.05
 #define NB_PINGS 10
+#define DEBUG
 
 int ping(int conn);
+void compute_preds(W ***preds, W state, int n);
+
+unsigned int t, d, s, v_max, space;
+unsigned int ***opt;
 
 int main(int argc, char *argv[]){
   struct sockaddr_in dst, srv;
@@ -25,6 +30,39 @@ int main(int argc, char *argv[]){
   socklen_t socksize = sizeof(struct sockaddr_in);
   char res[MAX], rcv[MAX];
 
+  #ifndef DEBUG
+  
+  if (argc < 6){
+    printf("Use: %s t d s v_max opt_file\n", argv[0]);
+    return 0;
+  }
+
+  /* Assignation of the important variables */
+  
+  t = atoi(argv[1]);
+  d = atoi(argv[2]);
+  s = atoi(argv[3]);
+  v_max = atoi(argv[4]);
+  space = state_space(d, s);
+
+  /* Reading the optimal policies */
+  FILE* fd = NULL;
+  fd = fopen(argv[5], "r");
+
+  if (fd == NULL){
+    perror("fopen()");
+    exit(EXIT_FAILURE);
+  }
+
+  for (unsigned int i = 0; i < t; i++)
+    for (unsigned int j = 0; j < space; j++)
+      for (unsigned int k = 0; k <= s; k++)
+	fscanf(fd, "%u", &pol[i][j][k]);
+  
+  fclose(fd);
+
+  #endif
+  
   memset(&srv, 0, sizeof(srv));
   srv.sin_family = AF_INET;
   srv.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -47,6 +85,8 @@ int main(int argc, char *argv[]){
   }
 
   int n = ping(conn);
+
+  W ***preds = NULL;
   
   for (unsigned int i = 0; i < d; i++)
     for (unsigned int j = 0; j <= s; j++){
@@ -88,4 +128,8 @@ int ping(int conn){
   printf("number of intervals = %d\n", res+1);
 
   return res + 1;
+}
+
+void compute_preds(W ***preds, W state, int n){
+  
 }
