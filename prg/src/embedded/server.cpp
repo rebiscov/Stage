@@ -20,6 +20,7 @@
 
 int ping(int conn);
 void compute_preds(W ***preds, W state, int n);
+void rcv_line(char* rcv, int sock);
 
 unsigned int t, d, s, v_max, space;
 unsigned int ***opt;
@@ -132,4 +133,20 @@ void compute_preds(W *preds, W state, int prof, int index){
       else
 	preds[index] = w;
     }
+}
+
+void rcv_line(char* rcv, int sock){
+  char* buff = rcv;
+  int len;
+  do{
+    len = recv(sock, rcv, MAX, 0);
+    buff += len;
+    buff[0] = '\0';
+  } while(buff[-1] != '\n');
+  
+  buff[0] = '\0';
+}
+
+W rcv_w(int conn){
+  
 }
