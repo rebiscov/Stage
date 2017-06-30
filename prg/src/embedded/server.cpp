@@ -21,8 +21,9 @@ int ping(int conn);
 int main(int argc, char *argv[]){
   struct sockaddr_in dst, srv;
   int sock;
+  unsigned int d = 2, s = 2;
   socklen_t socksize = sizeof(struct sockaddr_in);
-  char res[MAX];
+  char res[MAX], rcv[MAX];
 
   memset(&srv, 0, sizeof(srv));
   srv.sin_family = AF_INET;
@@ -47,6 +48,17 @@ int main(int argc, char *argv[]){
 
   int n = ping(conn);
   
+  for (unsigned int i = 0; i < d; i++)
+    for (unsigned int j = 0; j <= s; j++){
+      if (i == d-1 && j == s){
+	sprintf(rcv, "%d\n", i*d+j);
+	send(conn, rcv, strlen(rcv), 0);
+      }
+      else{
+	sprintf(rcv, "%d ", i*d+j);
+	send(conn, rcv, strlen(rcv), 0);
+      }
+    }
   
   close(conn);
   close(sock);

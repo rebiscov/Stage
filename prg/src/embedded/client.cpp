@@ -18,6 +18,7 @@ int pong(int sock);
 
 int main(int argc, char *argv[]){
   int sock, len;
+  unsigned int d = 2, s = 2;
   struct sockaddr_in dst;
   char rcv[MAX];
 
@@ -38,6 +39,9 @@ int main(int argc, char *argv[]){
   }
 
   int n = pong(sock);
+
+  rcv_line(rcv, sock);
+  printf("%s", rcv);
 
   close(sock);
 
