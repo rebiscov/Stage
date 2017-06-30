@@ -15,6 +15,7 @@
 
 void rcv_line(char* rcv, int sock);
 int pong(int sock);
+void send_w(W w, int sock);
 
 int main(int argc, char *argv[]){
   int sock, len;
@@ -73,4 +74,15 @@ int pong (int sock){
   printf("number of intervals = %d\n", res+1);
   
   return res + 1;
+}
+
+void send_w(W w, int sock){
+  char buff[MAX];
+  unsigned int d = w.size();
+  for (unsigned int i = 1; i < d-1; i++){
+    sprintf(buff, "%d ", w.get(i));
+    send(sock, buff, strlen(buff), 0);
+  }
+  sprintf(buff, "%d\n", w.get(d));
+  send(sock, buff, strlen(buff), 0);
 }
