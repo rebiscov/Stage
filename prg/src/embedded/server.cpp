@@ -135,11 +135,11 @@ void compute_preds(W *preds, W state, int prof, int index){
     }
 }
 
-void rcv_line(char* rcv, int sock){
+void rcv_line(char* rcv, int conn){
   char* buff = rcv;
   int len;
   do{
-    len = recv(sock, rcv, MAX, 0);
+    len = recv(conn, rcv, MAX, 0);
     buff += len;
     buff[0] = '\0';
   } while(buff[-1] != '\n');
@@ -148,5 +148,15 @@ void rcv_line(char* rcv, int sock){
 }
 
 W rcv_w(int conn){
-  
+  char buff[MAX];
+  unsigned int *tab = new unsigned int[d];
+  W res(d);
+  rcv_line(buff, conn);
+  tab[d-1] = atoi(strtok(buff, " \n"));
+  for (unsigned int i = 1; i < d; i++)
+    tab[d-i-1] = atoi(strtok(NULL, " \n"));
+  for (unsigned int i = d; i > 0; i--)
+    res.set(i, tab[i-1]);
+
+  return res;
 }
