@@ -31,3 +31,20 @@ unsigned int minus(unsigned int a, unsigned int b){
   else
     return 0;
 }
+
+unsigned int pow(unsigned int e, unsigned int n){
+  if (n == 0)
+    return 1;
+  else if (n == 1)
+    return e;
+  else{
+    if (n%2 == 0){
+      unsigned int f = pow(e, n/2);
+      return f*f;
+    }
+    else{
+      unsigned int f = pow(e, n/2);
+      return e*f*f;
+    }
+  }
+}
