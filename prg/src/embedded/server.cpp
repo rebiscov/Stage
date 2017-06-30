@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include "states.hpp"
+#include "math.hpp"
 
 #define MAX 5000
 #define PORT 1337
@@ -86,19 +87,8 @@ int main(int argc, char *argv[]){
 
   int n = ping(conn);
 
-  W ***preds = NULL;
-  
-  for (unsigned int i = 0; i < d; i++)
-    for (unsigned int j = 0; j <= s; j++){
-      if (i == d-1 && j == s){
-	sprintf(rcv, "%d\n", i*d+j);
-	send(conn, rcv, strlen(rcv), 0);
-      }
-      else{
-	sprintf(rcv, "%d ", i*d+j);
-	send(conn, rcv, strlen(rcv), 0);
-      }
-    }
+  W *preds = NULL;
+  preds = new W[pow(d*(s+1), (unsigned int)n)];
   
   close(conn);
   close(sock);
@@ -130,6 +120,16 @@ int ping(int conn){
   return res + 1;
 }
 
-void compute_preds(W ***preds, W state, int n){
-  
+void compute_preds(W *preds, W state, int prof, int index){
+  for (unsigned int i = 0; i < d; i++)
+    for (unsigned int j = 0 ; j <= s; j++){
+      W w = state;
+      w.add_work(i+1, j);
+      index += pow((s+1)*d, prof) * ((s+1)*i+j);
+
+      if (prof > 1)
+	compute_preds(preds, w, --prof, index);
+      else
+	preds[index] = w;
+    }
 }
