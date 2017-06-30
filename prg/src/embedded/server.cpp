@@ -21,6 +21,7 @@
 int ping(int conn);
 void compute_preds(W ***preds, W state, int n);
 void rcv_line(char* rcv, int sock);
+W rcv_w(int conn);
 
 unsigned int t, d, s, v_max, space;
 unsigned int ***opt;
