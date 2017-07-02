@@ -1,8 +1,9 @@
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <unordered_map>
+#include <vector>
+#include <utility>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -12,24 +13,24 @@
 #include "math.hpp"
 
 #define MAX 5000
-#define PORT 1337
+#define PORT 1338
 #define THRESHOLD 0.1
 #define ERROR 0.05
 #define NB_PINGS 10
 #define DEBUG
 
 int ping(int conn);
-void compute_preds(W ***preds, W state, int n);
+void compute_preds(W *preds, W state, int prof, int index);
 void rcv_line(char* rcv, int sock);
 W rcv_w(int conn);
 
-unsigned int t, d, s, v_max, space;
+unsigned int t, d = 3, s = 2, v_max, space;
 unsigned int ***opt;
+int n;
 
 int main(int argc, char *argv[]){
   struct sockaddr_in dst, srv;
   int sock;
-  unsigned int d = 2, s = 2;
   socklen_t socksize = sizeof(struct sockaddr_in);
   char res[MAX], rcv[MAX];
 
@@ -87,10 +88,20 @@ int main(int argc, char *argv[]){
     exit(EXIT_FAILURE);
   }
 
-  int n = ping(conn);
+  n = ping(conn);
+  n = 2;
+
+  W a = rcv_w(conn);
+  a.print_w();
 
   W *preds = NULL;
   preds = new W[pow(d*(s+1), (unsigned int)n)];
+  printf("pow: %u\n", pow(d*(s+1), (unsigned int)n));
+
+  compute_preds(preds, a, 0, 0);
+
+  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int) n); i++)
+    preds[i].print_w();
   
   close(conn);
   close(sock);
@@ -123,16 +134,19 @@ int ping(int conn){
 }
 
 void compute_preds(W *preds, W state, int prof, int index){
+  printf("p:%d\n", prof);
   for (unsigned int i = 0; i < d; i++)
     for (unsigned int j = 0 ; j <= s; j++){
       W w = state;
-      w.add_work(i+1, j);
-      index += pow((s+1)*d, prof) * ((s+1)*i+j);
-
-      if (prof > 1)
-	compute_preds(preds, w, --prof, index);
-      else
-	preds[index] = w;
+      int id = index;
+      w.add_work(i+1, j);      
+      id += (int)(pow((s+1)*d, prof) * ((s+1)*i+j));
+      if (prof < n-1)
+	compute_preds(preds, w, prof+1, id);
+      else{
+	printf("id: %d, d = %u, s = %u, prof = %d\n", id, i+1, j, prof);
+	preds[id] = w;
+      }
     }
 }
 
@@ -140,7 +154,7 @@ void rcv_line(char* rcv, int conn){
   char* buff = rcv;
   int len;
   do{
-    len = recv(conn, rcv, MAX, 0);
+    len = recv(conn, buff, MAX, 0);
     buff += len;
     buff[0] = '\0';
   } while(buff[-1] != '\n');
@@ -150,14 +164,22 @@ void rcv_line(char* rcv, int conn){
 
 W rcv_w(int conn){
   char buff[MAX];
-  unsigned int *tab = new unsigned int[d];
-  W res(d);
+  W res(d);  
+  unsigned int *tab = NULL;
+  tab = new unsigned int[d];
+  if (tab == NULL){
+    printf("Error with allocation in rcv_w\n");
+    exit(EXIT_FAILURE);
+  }
+
   rcv_line(buff, conn);
-  tab[d-1] = atoi(strtok(buff, " \n"));
+  tab[0] = (unsigned int)atoi(strtok(buff, " \n"));
+  
   for (unsigned int i = 1; i < d; i++)
-    tab[d-i-1] = atoi(strtok(NULL, " \n"));
+    tab[i] = (unsigned int)atoi(strtok(NULL, " \n"));
   for (unsigned int i = d; i > 0; i--)
     res.set(i, tab[i-1]);
-
+  delete tab;
+  
   return res;
 }

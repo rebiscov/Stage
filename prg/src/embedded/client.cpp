@@ -43,9 +43,6 @@ int main(int argc, char *argv[]){
 
   n = pong(sock);
   W a(d);
-  a.add_work(2, 2);
-  a.add_work(1, 1);
-  a.add_work(3, 1);
 
   send_w(a, sock);
 
