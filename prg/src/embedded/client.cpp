@@ -10,16 +10,18 @@
 #include "states.hpp"
 
 #define MAX 5000
-#define PORT 1337
+#define PORT 1338
 #define NB_PINGS 10
 
 void rcv_line(char* rcv, int sock);
 int pong(int sock);
 void send_w(W w, int sock);
 
+int n;
+
 int main(int argc, char *argv[]){
   int sock, len;
-  unsigned int d = 2, s = 2;
+  unsigned int d = 3, s = 2;
   struct sockaddr_in dst;
   char rcv[MAX];
 
@@ -39,10 +41,13 @@ int main(int argc, char *argv[]){
     exit(EXIT_FAILURE);
   }
 
-  int n = pong(sock);
+  n = pong(sock);
+  W a(d);
+  a.add_work(2, 2);
+  a.add_work(1, 1);
+  a.add_work(3, 1);
 
-  rcv_line(rcv, sock);
-  printf("%s", rcv);
+  send_w(a, sock);
 
   close(sock);
 
@@ -79,7 +84,7 @@ int pong (int sock){
 void send_w(W w, int sock){
   char buff[MAX];
   unsigned int d = w.size();
-  for (unsigned int i = 1; i < d-1; i++){
+  for (unsigned int i = 1; i < d; i++){
     sprintf(buff, "%d ", w.get(i));
     send(sock, buff, strlen(buff), 0);
   }
