@@ -7,6 +7,8 @@ W::W(void): w(NULL), m_d(0){
 
 W::W(unsigned int d): m_d(d){
   w = new unsigned int[d];
+  for (unsigned int i = 0; i < d; i++)
+    w[i] = 0;
 }
 
 W::W(const W& obj){
