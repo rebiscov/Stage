@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <unordered_map>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -16,6 +17,7 @@
 void rcv_line(char* rcv, int sock);
 int pong(int sock);
 void send_w(W w, int sock);
+void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma);
 
 unsigned int t, d, s, v_max, space;
 std::unordered_map<W, unsigned int> h;
@@ -27,6 +29,8 @@ int main(int argc, char *argv[]){
   int sock, len;
   struct sockaddr_in dst;
   char rcv[MAX];
+
+  srand(time(NULL));
 
   if (argc < 6){
     printf("Use: %s t d s v_max distri_file\n", argv[0]);
@@ -140,4 +144,17 @@ void send_w(W w, int sock){
   }
   sprintf(buff, "%d\n", w.get(d));
   send(sock, buff, strlen(buff), 0);
+}
+
+void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma){
+  double *cumulative = new double[d*(s+1)];
+  cumulative[0] = distri[id_w][0][0];
+  for (unsigned int i = 0; i <= d*(s+1); i++)
+    cumulative[i] = distri[id_w][i/(s+1)][i%(s+1)] + cumulative[i-1];
+  double r = rand() / RAND_MAX;
+  unsigned int i = 0;
+  while (cumulative[i] < 0)
+    i++;
+  delta = (i/(s+1)) + 1;
+  sigma = i % (s+1);
 }
