@@ -24,10 +24,10 @@ void compute_preds(W *preds, W state, int prof, int index, unsigned int l_speed,
 void rcv_line(char* rcv, int sock);
 W rcv_w(int conn);
 
-unsigned int t, d = 3, s = 2, v_max, space, last_speed = 0;
+unsigned int t, d = 3, s = 2, v_max = 6, space, last_speed = 0;
 unsigned int ***pol;
 int n;
-std::unordered_map<W, unsigned int> h(space);
+std::unordered_map<W, unsigned int> h;
 
 int main(int argc, char *argv[]){
   struct sockaddr_in dst, srv;
