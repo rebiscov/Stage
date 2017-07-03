@@ -25,7 +25,7 @@ void rcv_line(char* rcv, int sock);
 W rcv_w(int conn);
 
 unsigned int t, d = 3, s = 2, v_max, space;
-unsigned int ***opt;
+unsigned int ***pol;
 int n;
 
 int main(int argc, char *argv[]){
@@ -34,10 +34,8 @@ int main(int argc, char *argv[]){
   socklen_t socksize = sizeof(struct sockaddr_in);
   char res[MAX], rcv[MAX];
 
-  #ifndef DEBUG
-  
   if (argc < 6){
-    printf("Use: %s t d s v_max opt_file\n", argv[0]);
+    printf("Use: %s t d s v_max pol_file\n", argv[0]);
     return 0;
   }
 
@@ -58,14 +56,24 @@ int main(int argc, char *argv[]){
     exit(EXIT_FAILURE);
   }
 
-  for (unsigned int i = 0; i < t; i++)
-    for (unsigned int j = 0; j < space; j++)
-      for (unsigned int k = 0; k <= s; k++)
-	fscanf(fd, "%u", &pol[i][j][k]);
-  
-  fclose(fd);
+  pol = new unsigned int**[t+1];
+  if (pol == NULL){
+    printf("Error: memory allocation for pol did not work!\n");
+    exit(1);
+  }
 
-  #endif
+  for (unsigned int i = 0; i <= t; i++){
+    pol[i] = new unsigned int*[space];
+    for (unsigned int j = 0; j < space; j++)
+      pol[i][j] = new unsigned int[v_max+1];
+  }
+  
+  for (unsigned int i = 1; i <= t; i++)
+    for (unsigned int j = 0; j < space; j++)
+      for (unsigned int k = 0; k <= v_max; k++)
+	fscanf(fd, "%u", &pol[i][j][k]);
+   
+  fclose(fd);
   
   memset(&srv, 0, sizeof(srv));
   srv.sin_family = AF_INET;
@@ -134,7 +142,6 @@ int ping(int conn){
 }
 
 void compute_preds(W *preds, W state, int prof, int index){
-  printf("p:%d\n", prof);
   for (unsigned int i = 0; i < d; i++)
     for (unsigned int j = 0 ; j <= s; j++){
       W w = state;
@@ -143,10 +150,8 @@ void compute_preds(W *preds, W state, int prof, int index){
       id += (int)(pow((s+1)*d, prof) * ((s+1)*i+j));
       if (prof < n-1)
 	compute_preds(preds, w, prof+1, id);
-      else{
-	printf("id: %d, d = %u, s = %u, prof = %d\n", id, i+1, j, prof);
+      else
 	preds[id] = w;
-      }
     }
 }
 
