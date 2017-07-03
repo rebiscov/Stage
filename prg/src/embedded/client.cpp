@@ -17,14 +17,66 @@ void rcv_line(char* rcv, int sock);
 int pong(int sock);
 void send_w(W w, int sock);
 
+unsigned int t, d, s, v_max, space;
+std::unordered_map<W, unsigned int> h;
 int n;
+
+double ***distri;
 
 int main(int argc, char *argv[]){
   int sock, len;
-  unsigned int d = 3, s = 2;
   struct sockaddr_in dst;
   char rcv[MAX];
 
+  if (argc < 6){
+    printf("Use: %s t d s v_max distri_file\n", argv[0]);
+    exit(EXIT_FAILURE);
+  }
+
+    /* Assignation of the important variables */
+  
+  t = atoi(argv[1]);
+  d = atoi(argv[2]);
+  s = atoi(argv[3]);
+  v_max = atoi(argv[4]);
+  space = state_space(d, s);
+
+  /* Defining hashtable and w_set */
+
+  W *w_set = NULL;
+  w_set = compute_w(d, s);
+
+  for (unsigned int i = 0; i < space; i++)
+    h[w_set[i]] = i;
+
+  /* Loading distri */
+  
+  distri = new double**[space];
+
+  for (unsigned int i = 0; i < space; i++){
+    distri[i] = new double*[d];
+    for (unsigned int j = 0; j < d; j++)
+      distri[i][j] = new double[s+1];
+  }
+
+  FILE *fd = NULL;
+  fd = fopen(argv[5], "r");
+
+  if (fd == NULL){
+    perror("fopen()");
+    exit(EXIT_FAILURE);
+  }
+
+  for (unsigned int k = 0; k < space; k++){
+    for(unsigned int i = 1; i <= d; i++)
+      for (unsigned int j = 0; j <= s; j++)
+	fscanf(fd, "%lf", &distri[k][i-1][j]);
+  }
+
+  fclose(fd);
+
+  /* Networking */
+  
   sock = socket(AF_INET, SOCK_STREAM, 0);
   if (sock == -1){
     perror("sock()");
@@ -43,6 +95,7 @@ int main(int argc, char *argv[]){
 
   n = pong(sock);
   W a(d);
+  a.print_w();
 
   send_w(a, sock);
 
