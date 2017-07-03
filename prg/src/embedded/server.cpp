@@ -20,13 +20,14 @@
 #define DEBUG
 
 int ping(int conn);
-void compute_preds(W *preds, W state, int prof, int index);
+void compute_preds(W *preds, W state, int prof, int index, unsigned int l_speed, unsigned int c_t);
 void rcv_line(char* rcv, int sock);
 W rcv_w(int conn);
 
-unsigned int t, d = 3, s = 2, v_max, space;
+unsigned int t, d = 3, s = 2, v_max, space, last_speed = 0;
 unsigned int ***pol;
 int n;
+std::unordered_map<W, unsigned int> h(space);
 
 int main(int argc, char *argv[]){
   struct sockaddr_in dst, srv;
@@ -46,6 +47,14 @@ int main(int argc, char *argv[]){
   s = atoi(argv[3]);
   v_max = atoi(argv[4]);
   space = state_space(d, s);
+
+  /* Defining hashtable and w_set */
+
+  W *w_set = NULL;
+  w_set = compute_w(d, s);
+
+  for (unsigned int i = 0; i < space; i++)
+    h[w_set[i]] = i;
 
   /* Reading the optimal policies */
   FILE* fd = NULL;
@@ -104,9 +113,8 @@ int main(int argc, char *argv[]){
 
   W *preds = NULL;
   preds = new W[pow(d*(s+1), (unsigned int)n)];
-  printf("pow: %u\n", pow(d*(s+1), (unsigned int)n));
 
-  compute_preds(preds, a, 0, 0);
+  compute_preds(preds, a, 0, 0, last_speed, 0);
 
   for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int) n); i++)
     preds[i].print_w();
@@ -141,15 +149,17 @@ int ping(int conn){
   return res + 1;
 }
 
-void compute_preds(W *preds, W state, int prof, int index){
+void compute_preds(W *preds, W state, int prof, int index, unsigned int l_speed, unsigned int c_t){
   for (unsigned int i = 0; i < d; i++)
     for (unsigned int j = 0 ; j <= s; j++){
       W w = state;
       int id = index;
-      w.add_work(i+1, j);      
+      w.add_work(i+1, j);
+      unsigned int speed = pol[c_t+prof][h[state]][l_speed];
+      w.inc_time(speed);
       id += (int)(pow((s+1)*d, prof) * ((s+1)*i+j));
       if (prof < n-1)
-	compute_preds(preds, w, prof+1, id);
+	compute_preds(preds, w, prof+1, id, speed, c_t);
       else
 	preds[id] = w;
     }
