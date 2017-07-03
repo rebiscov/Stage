@@ -55,7 +55,7 @@ void rcv_line(char* rcv, int sock){
   char* buff = rcv;
   int len;
   do{
-    len = recv(sock, rcv, MAX, 0);
+    len = recv(sock, buff, MAX, 0);
     buff += len;
     buff[0] = '\0';
   } while(buff[-1] != '\n');
