@@ -23,6 +23,8 @@ int ping(int conn);
 void compute_preds(W *preds, W state, int prof, int index, unsigned int l_speed, unsigned int c_t);
 void rcv_line(char* rcv, int sock);
 W rcv_w(int conn);
+void send_preds(const W *preds, int conn);
+void send_w(W w, int conn);
 
 unsigned int t, d = 3, s = 2, v_max = 6, space, last_speed = 0;
 unsigned int ***pol;
@@ -106,17 +108,18 @@ int main(int argc, char *argv[]){
   }
 
   n = ping(conn);
-  n = 2;
-
-  W a = rcv_w(conn);
-  a.print_w();
 
   W *preds = NULL;
   preds = new W[pow(d*(s+1), (unsigned int)n)];
 
-  compute_preds(preds, a, 0, 0, last_speed, 0);
+  W w(d);
 
-  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int) n); i++)
+  w = rcv_w(conn);
+
+  compute_preds(preds, w, 0, 0, last_speed, 0);
+  send_preds(preds, conn);
+
+  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++)
     preds[i].print_w();
   
   close(conn);
@@ -197,4 +200,23 @@ W rcv_w(int conn){
   delete tab;
   
   return res;
+}
+
+void send_w(W w, int conn){
+  char buff[MAX];
+  unsigned int d = w.size();
+  for (unsigned int i = 1; i < d; i++){
+    sprintf(buff, "%d ", w.get(i));
+    send(conn, buff, strlen(buff), 0);
+  }
+  sprintf(buff, "%d\n", w.get(d));
+  send(conn, buff, strlen(buff), 0);
+}
+
+void send_preds(const W *preds, int conn){
+  char buff[5];
+  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++){
+    send_w(preds[i], conn);
+    recv(conn, buff, 10, 0);
+  }
 }
