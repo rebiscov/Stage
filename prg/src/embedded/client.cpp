@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include "states.hpp"
+#include "math.hpp"
 
 #define MAX 5000
 #define PORT 1338
@@ -17,6 +18,8 @@
 void rcv_line(char* rcv, int sock);
 int pong(int sock);
 void send_w(W w, int sock);
+W rcv_w(int sock);
+void rcv_preds(W *preds, int sock);
 void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma);
 
 unsigned int t, d, s, v_max, space;
@@ -98,11 +101,17 @@ int main(int argc, char *argv[]){
   }
 
   n = pong(sock);
-  W a(d);
-  a.print_w();
 
-  send_w(a, sock);
+  W *preds = NULL;
+  preds = new W[pow(d*(s+1), (unsigned int)n)];
+  
+  W w(d);
 
+  send_w(w, sock);
+  rcv_preds(preds, sock);
+
+  
+  
   close(sock);
 
   return 0;
@@ -146,6 +155,35 @@ void send_w(W w, int sock){
   send(sock, buff, strlen(buff), 0);
 }
 
+W rcv_w(int sock){
+  char buff[MAX];
+  W res(d);  
+  unsigned int *tab = NULL;
+  tab = new unsigned int[d];
+  if (tab == NULL){
+    printf("Error with allocation in rcv_w\n");
+    exit(EXIT_FAILURE);
+  }
+
+  rcv_line(buff, sock);
+  tab[0] = (unsigned int)atoi(strtok(buff, " \n"));
+  
+  for (unsigned int i = 1; i < d; i++)
+    tab[i] = (unsigned int)atoi(strtok(NULL, " \n"));
+  for (unsigned int i = d; i > 0; i--)
+    res.set(i, tab[i-1]);
+  delete tab;
+  
+  return res;
+}
+
+void rcv_preds(W *preds, int sock){
+  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++){
+    preds[i] = rcv_w(sock);
+    send(sock, "ok", 2, 0);
+  }
+}
+
 void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma){
   double *cumulative = new double[d*(s+1)];
   cumulative[0] = distri[id_w][0][0];
@@ -158,3 +196,5 @@ void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma){
   delta = (i/(s+1)) + 1;
   sigma = i % (s+1);
 }
+
+
