@@ -74,7 +74,8 @@ int main(int argc, char *argv[]){
     perror("fopen()");
     exit(EXIT_FAILURE);
   }
-
+  
+  fscanf(fd, "%u %u", &d, &s);
   for (unsigned int k = 0; k < space; k++){
     for(unsigned int i = 1; i <= d; i++)
       for (unsigned int j = 0; j <= s; j++)
@@ -110,9 +111,13 @@ int main(int argc, char *argv[]){
 
   send_w(w, sock);
   rcv_preds(preds, sock);
+  unsigned int delta, sigma;
 
-  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++)
-    preds[i].print_w();
+  for (unsigned int i = 0; i < t; i++){
+    rand_couple(h[w], delta, sigma);
+    printf("%u %u\n", delta, sigma);
+  }
+    
   
   close(sock);
 
@@ -184,19 +189,19 @@ W rcv_w(int sock){
 }
 
 void rcv_preds(W *preds, int sock){
-  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++){
+  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++)
     preds[i] = rcv_w(sock);
-  }
 }
 
 void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma){
   double *cumulative = new double[d*(s+1)];
   cumulative[0] = distri[id_w][0][0];
-  for (unsigned int i = 0; i <= d*(s+1); i++)
+  for (unsigned int i = 1; i < d*(s+1); i++)
     cumulative[i] = distri[id_w][i/(s+1)][i%(s+1)] + cumulative[i-1];
-  double r = rand() / RAND_MAX;
+  
+  double r = (double)rand() / RAND_MAX;
   unsigned int i = 0;
-  while (cumulative[i] < 0)
+  while (cumulative[i] < r)
     i++;
   delta = (i/(s+1)) + 1;
   sigma = i % (s+1);
