@@ -198,12 +198,14 @@ W rcv_w(int conn){
   for (unsigned int i = d; i > 0; i--)
     res.set(i, tab[i-1]);
   delete tab;
+
+  send(conn, "ok", 2, 0);
   
   return res;
 }
 
 void send_w(W w, int conn){
-  char buff[MAX];
+  char buff[MAX], recup[10];
   unsigned int d = w.size();
   for (unsigned int i = 1; i < d; i++){
     sprintf(buff, "%d ", w.get(i));
@@ -211,12 +213,13 @@ void send_w(W w, int conn){
   }
   sprintf(buff, "%d\n", w.get(d));
   send(conn, buff, strlen(buff), 0);
+
+  recv(conn, recup, 10, 0);
 }
 
 void send_preds(const W *preds, int conn){
   char buff[5];
   for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++){
     send_w(preds[i], conn);
-    recv(conn, buff, 10, 0);
   }
 }

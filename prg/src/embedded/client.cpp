@@ -22,7 +22,7 @@ W rcv_w(int sock);
 void rcv_preds(W *preds, int sock);
 void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma);
 
-unsigned int t, d, s, v_max, space;
+unsigned int t, d, s, v_max, space, num;
 std::unordered_map<W, unsigned int> h;
 int n;
 
@@ -47,6 +47,7 @@ int main(int argc, char *argv[]){
   s = atoi(argv[3]);
   v_max = atoi(argv[4]);
   space = state_space(d, s);
+  num = 0;
 
   /* Defining hashtable and w_set */
 
@@ -110,7 +111,8 @@ int main(int argc, char *argv[]){
   send_w(w, sock);
   rcv_preds(preds, sock);
 
-  
+  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++)
+    preds[i].print_w();
   
   close(sock);
 
@@ -145,7 +147,7 @@ int pong (int sock){
 }
 
 void send_w(W w, int sock){
-  char buff[MAX];
+  char buff[MAX], recup[10];
   unsigned int d = w.size();
   for (unsigned int i = 1; i < d; i++){
     sprintf(buff, "%d ", w.get(i));
@@ -153,6 +155,8 @@ void send_w(W w, int sock){
   }
   sprintf(buff, "%d\n", w.get(d));
   send(sock, buff, strlen(buff), 0);
+
+  recv(sock, recup, 10, 0);
 }
 
 W rcv_w(int sock){
@@ -173,6 +177,8 @@ W rcv_w(int sock){
   for (unsigned int i = d; i > 0; i--)
     res.set(i, tab[i-1]);
   delete tab;
+
+  send(sock, "ok", 2, 0);
   
   return res;
 }
@@ -180,7 +186,6 @@ W rcv_w(int sock){
 void rcv_preds(W *preds, int sock){
   for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++){
     preds[i] = rcv_w(sock);
-    send(sock, "ok", 2, 0);
   }
 }
 
