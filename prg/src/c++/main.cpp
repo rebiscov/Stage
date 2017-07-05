@@ -5,8 +5,8 @@
 #include <thread>
 #include <cstring>
 #include "states.hpp"
-#include "funs.hpp"
-#include "math.hpp"
+#include "funs.h"
+#include "math.h"
 
 #define NB_THREADS 4
 

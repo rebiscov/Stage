@@ -1,4 +1,4 @@
-#include "math.hpp"
+#include "math.h"
 
 unsigned int bino(unsigned int k, unsigned int n){
   if (k < 0)

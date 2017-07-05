@@ -1,10 +1,10 @@
 #include <cmath>
 #include <cstdio>
-#include "funs.hpp"
-#include "math.hpp"
+#include "funs.h"
+#include "math.h"
 
 double c(unsigned int v){
-  return (double)(v*v*v);
+  return (double)(v*v);
 }
 
 double f (unsigned int v1, unsigned int v2, unsigned int t){
@@ -15,7 +15,7 @@ double f (unsigned int v1, unsigned int v2, unsigned int t){
     unsigned int v_min = min(v1, v2);
     unsigned int v_max = max(v1,v2);
     double delta_1 = (double)(delta*(double)v_min) / (double)(v_max-v_min);
-    double res = delta_1*c(v_max) - (delta + delta_1)*c(v_min) + delta*(double)(v1+v2)/2;
+    double res = delta_1*c(v_max) - (delta + delta_1)*c(v_min) + delta*((1/3)*(pow((double)v_max, 3.) - pow((double)v_min, 3.)));
     
     return res;
   }

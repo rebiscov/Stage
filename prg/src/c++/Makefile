@@ -10,7 +10,10 @@ perf: math.o funs.o states.o perf.o
 	$(CC) $(FLAGS) -o perf math.o states.o funs.o perf.o
 
 %.o: %.c
-	$(CC) $(FLAGS) -c %.c
+	$(CC) $(FLAGS) -c $^
+
+%.o: %.cpp
+	$(CC) $(FLAGS) -c $^
 
 clemacs:
 	rm *~

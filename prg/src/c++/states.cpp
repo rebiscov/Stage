@@ -1,5 +1,5 @@
 #include <iostream>
-#include "math.hpp"
+#include "math.h"
 #include "states.hpp"
 
 W::W(void): w(NULL), m_d(0){
