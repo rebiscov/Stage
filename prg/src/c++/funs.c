@@ -1,5 +1,5 @@
-#include <cmath>
-#include <cstdio>
+#include <math.h>
+#include <stdio.h>
 #include "funs.h"
 #include "math.h"
 
