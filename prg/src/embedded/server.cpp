@@ -20,10 +20,10 @@
 #define DEBUG
 
 int ping(int conn);
-void compute_preds(W *preds, W state, int prof, int index, unsigned int l_speed, unsigned int c_t);
+void compute_preds(unsigned int *preds, W state, int prof, int index, unsigned int l_speed, unsigned int c_t);
 void rcv_line(char* rcv, int sock);
 W rcv_w(int conn);
-void send_preds(const W *preds, int conn);
+void send_preds(const unsigned int *preds, int conn);
 void send_w(W w, int conn);
 
 unsigned int t, d = 3, s = 2, v_max = 6, space, last_speed = 0;
@@ -109,18 +109,21 @@ int main(int argc, char *argv[]){
 
   n = ping(conn);
 
-  W *preds = NULL;
-  preds = new W[pow(d*(s+1), (unsigned int)n)];
+  unsigned int *preds = NULL;
+  preds = new unsigned int[pow(d*(s+1), (unsigned int)n)];
 
   W w(d);
 
   w = rcv_w(conn);
 
   compute_preds(preds, w, 0, 0, last_speed, 0);
+  printf("send\n");
   send_preds(preds, conn);
+  printf("sent\n");
 
-  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++)
-    preds[i].print_w();
+  for (unsigned int i = 1; i < t; i++){
+    
+  }
   
   close(conn);
   close(sock);
@@ -152,7 +155,7 @@ int ping(int conn){
   return res + 1;
 }
 
-void compute_preds(W *preds, W state, int prof, int index, unsigned int l_speed, unsigned int c_t){
+void compute_preds(unsigned int *preds, W state, int prof, int index, unsigned int l_speed, unsigned int c_t){
   for (unsigned int i = 0; i < d; i++)
     for (unsigned int j = 0 ; j <= s; j++){
       W w = state;
@@ -164,7 +167,7 @@ void compute_preds(W *preds, W state, int prof, int index, unsigned int l_speed,
       if (prof < n-1)
 	compute_preds(preds, w, prof+1, id, speed, c_t);
       else
-	preds[id] = w;
+	preds[id] = pol[c_t+prof+1][h[state]][speed];
     }
 }
 
@@ -217,9 +220,15 @@ void send_w(W w, int conn){
   recv(conn, recup, 10, 0);
 }
 
-void send_preds(const W *preds, int conn){
-  char buff[5];
-  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++){
-    send_w(preds[i], conn);
+void send_preds(const unsigned int *preds, int conn){
+  char buff[MAX], recup[10];
+  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n)-1; i++){
+    sprintf(buff, "%u", preds[i]);
+    printf("buff: %s", buff);
+    send(conn, buff, strlen(buff), 0);
+    recv(conn, recup, 10, 0);
   }
+  sprintf(buff, "%u", preds[pow(d*(s+1), (unsigned int)n)-1]);
+  send(conn, buff, strlen(buff), 0);
+  recv(conn, recup, 10, 0);  
 }

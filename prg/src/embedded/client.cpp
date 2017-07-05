@@ -19,7 +19,7 @@ void rcv_line(char* rcv, int sock);
 int pong(int sock);
 void send_w(W w, int sock);
 W rcv_w(int sock);
-void rcv_preds(W *preds, int sock);
+void rcv_preds(unsigned int *preds, int sock);
 void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma);
 
 unsigned int t, d, s, v_max, space, num;
@@ -104,18 +104,22 @@ int main(int argc, char *argv[]){
 
   n = pong(sock);
 
-  W *preds = NULL;
-  preds = new W[pow(d*(s+1), (unsigned int)n)];
+  unsigned int *preds = NULL;
+  preds = new unsigned int[pow(d*(s+1), (unsigned int)n)];
   
   W w(d);
 
   send_w(w, sock);
-  rcv_preds(preds, sock);
+  
   unsigned int delta, sigma;
 
   for (unsigned int i = 0; i < t; i++){
+    printf("receivng\n");
+    rcv_preds(preds, sock);
+    printf("received\n");
     rand_couple(h[w], delta, sigma);
-    printf("%u %u\n", delta, sigma);
+    num = num / (d*(s+1)) + ((s+1)*delta + sigma)*pow(d*(s+1), (unsigned int)n-1);
+    
   }
     
   
@@ -188,9 +192,13 @@ W rcv_w(int sock){
   return res;
 }
 
-void rcv_preds(W *preds, int sock){
-  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++)
-    preds[i] = rcv_w(sock);
+void rcv_preds(unsigned int *preds, int sock){
+  char buff[100];
+  for (unsigned int i = 0; i < pow(d*(s+1), (unsigned int)n); i++){
+    rcv_line(buff, sock);
+    preds[i] = atoi(buff);
+    send(sock, "ok", 2, 0);
+  }
 }
 
 void rand_couple(unsigned int id_w, unsigned int &delta, unsigned int &sigma){
