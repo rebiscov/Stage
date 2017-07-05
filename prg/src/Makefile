@@ -18,6 +18,12 @@ main.cmx: main.ml
 funs.cmx: funs.ml
 	$(CC) -c funs.ml
 
+fun_c.o: fun_c.c
+	$(CC) -c fun_c.c
+
+funs.o: c++/funs.c
+	gcc -c c++/funs.c
+
 perf.cmx: perf.ml
 	$(CC) -c perf.ml
 
@@ -27,8 +33,8 @@ toolkit.cmx: toolkit.ml
 simu.cmx: simu.ml
 	$(CC) -c simu.ml
 
-main.native: math.cmx funs.cmx states.cmx main.cmx
-	$(CC) math.cmx funs.cmx states.cmx main.cmx -o main.native
+main.native: math.cmx fun_c.o funs.cmx states.cmx main.cmx
+	$(CC) math.cmx fun_c.o funs.cmx states.cmx main.cmx -o main.native
 	make clean
 
 clean:
