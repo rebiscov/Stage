@@ -61,6 +61,6 @@ simulation:
 	make -C c++ clean
 	make simu
 	./simu.native $(t) $(v_max) distri.txt pol.txt simu.txt $(nb_simu)
-	make clean
+	rm simu.native
 	mv simu.txt simu
 
