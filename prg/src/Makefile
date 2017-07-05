@@ -51,14 +51,15 @@ tool.native: math.cmx funs.cmx states.cmx toolkit.cmx
 
 simu: simu.native
 
-simu.native: math.cmx funs.cmx states.cmx simu.cmx
-	$(CC) unix.cmxa math.cmx funs.cmx states.cmx simu.cmx -o simu.native
+simu.native: math.cmx fun_c.o funs.cmx states.cmx simu.cmx
+	$(CC) unix.cmxa math.cmx fun_c.o funs.cmx states.cmx simu.cmx -o simu.native
 	make clean
 
 perf: perf.native
 
-perf.native: perf.ml
-	$(CC) perf.native
+perf.native: math.cmx fun_c.o funs.cmx states.cmx perf.cmx
+	$(CC) math.cmx fun_c.o funs.cmx states.cmx perf.cmx -o perf.native
+	make clean
 
 simulation:
 	./proba/proba $(d) $(s) distri.txt
