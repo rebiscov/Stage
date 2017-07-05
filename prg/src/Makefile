@@ -1,25 +1,53 @@
-CC = ocamlbuild
+CC = ocamlopt
+CCH = ocamlc
 
 all: main.native
 
-main.native: main.ml
-	$(CC) main.native
+math.cmx: math.ml
+	$(CC) -c math.ml
+
+states.cmx: states.ml states.cmi
+	$(CC) -c states.ml
+
+states.cmi: states.mli
+	$(CCH) -c states.mli
+
+main.cmx: main.ml
+	$(CC) -c main.ml
+
+funs.cmx: funs.ml
+	$(CC) -c funs.ml
+
+perf.cmx: perf.ml
+	$(CC) -c perf.ml
+
+toolkit.cmx: toolkit.ml
+	$(CC) -c toolkit.ml
+
+simu.cmx: simu.ml
+	$(CC) -c simu.ml
+
+main.native: math.cmx funs.cmx states.cmx main.cmx
+	$(CC) math.cmx funs.cmx states.cmx main.cmx -o main.native
+	make clean
 
 clean:
-	$(CC) -clean
+	rm *.cmi *.cmx *.o
 
 clemacs:
 	rm *~
 
 tool: tool.native
 
-tool.native: toolkit.ml
-	$(CC) toolkit.native
+tool.native: math.cmx funs.cmx states.cmx toolkit.cmx
+	$(CC) math.cmx funs.cmx states.cmx toolkit.cmx -o toolkit.native
+	make clean
 
 simu: simu.native
 
-simu.native: simu.ml
-	$(CC) -pkg unix simu.native
+simu.native: math.cmx funs.cmx states.cmx simu.cmx
+	$(CC) unix.cmxa math.cmx funs.cmx states.cmx simu.cmx -o simu.native
+	make clean
 
 perf: perf.native
 
