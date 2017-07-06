@@ -24,7 +24,7 @@ double C(unsigned int v){
 
 double f (unsigned int v1, unsigned int v2, unsigned int t){
   double delta = 0.1;
-  if (t == 0 || v1 == v2 || v1 == 0 || v2 == 0)
+  if (t == 0 || v1 == v2)
     return 0;
   else{
     unsigned int v_min = min_f(v1, v2);
