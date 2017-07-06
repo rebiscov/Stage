@@ -30,7 +30,7 @@ plt.xlim(0,t)
 for i in range(int(len(num1)/3)):
     plt.title('Cost of the blue line: ' + str(num1[3*i][0]) + ', cost of the green line: ' + str(num2[3*i][0]))
     plt.plot(x, num1[3*i+1])
-    plt.step(x, num1[3*i+2], where ='post')
-    plt.step(x, num2[3*i+2], where ='post')    
+    plt.plot(x, num2[3*i+1])
+    plt.step(x, num1[3*i+2], where ='post')    
     plt.show()
 
