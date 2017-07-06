@@ -10,6 +10,8 @@
 
 #define NB_THREADS 4
 
+bool no_overcost = false;
+
 /* some prototypes */
 
 double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double ***opt, double ***distribution, std::unordered_map<W, unsigned int> &h, unsigned int t);
@@ -19,7 +21,7 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
 /* MAIN FUNCTION */
 
 int main(int argc, char* argv[]){
-  bool debug;
+  bool debug = false;
   printf("DP algorithm, C++ first version\n");
 
   if (argc < 5 ){
@@ -28,7 +30,8 @@ int main(int argc, char* argv[]){
   }
   if (argc >= 6)
     debug = strcmp("d", argv[5]) == 0;
-  
+  if (argc >= 7)
+    no_overcost = strcmp("no_ov", argv[6]) == 0;
 
   /* I define all the important variables, I extract the distribution in the file given by the user and I initialize the array J_t^v */
 
@@ -46,7 +49,6 @@ int main(int argc, char* argv[]){
   fscanf(fd, "%u %u", &d, &s);
 
   unsigned int space = state_space(d, s);
-
 
   /* We check if maximal speed if sufficient */
   if (v_max < d*s){
@@ -168,7 +170,12 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
     W& w = w_set[k];
 
     for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
-      double cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, opt, distribution, *h, t);
+      double cost;
+      if (no_overcost)
+	cost = c(v_max) + compute_sum(w, d, s, v_max, opt, distribution, *h, t);
+      else
+	cost = f(i, v_max, t) + c(v_max) + compute_sum(w, d, s, v_max, opt, distribution, *h, t);
+      
       unsigned int p = v_max;
 
       for (unsigned int j = 0; j < v_max; j++){
@@ -176,7 +183,11 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
 	  double c_j = c(j);
 	  if (c_j >= cost)
 	    break;
-	  double co = f(i,j,t) + c_j + compute_sum(w, d, s, j, opt, distribution, *h, t);
+	  double co;
+	  if (no_overcost)
+	    co = c_j + compute_sum(w, d, s, j, opt, distribution, *h, t);
+	  else
+	    co = f(i,j,t) + c_j + compute_sum(w, d, s, j, opt, distribution, *h, t);	    
 	  if (co < cost){
 	    cost = co;
 	    p = j;
