@@ -143,6 +143,39 @@ int main(int argc, char* argv[]){
     sp = compute_span(u, up, space);
   }
 
+  if (debug)
+    printf("Computing best policies...");
+
+  fd = NULL;
+  fd = fopen(argv[4], "w");
+
+  if (fd == NULL){
+    perror("fopen()");
+    exit(EXIT_FAILURE);
+  }
+  
+  for (unsigned int i = 0; i < space; i++){
+    long double cost = c(v_max);
+    unsigned int p = v_max;
+
+    for (unsigned int v = 0; v < v_max; v++){
+      if (v < w_set[i].get(1))
+	continue;
+      long double temp_c = compute_sum(w_set[i], d, s, v, u, distribution, h);
+      if (temp_c < cost){
+	cost = temp_c;
+	p = v;
+      }
+    }
+    if (i == space-1)
+      fprintf(fd, "%u\n", p);
+    else
+      fprintf(fd, "%u ", p);
+  }
+
+  fclose(fd);
+  printf("done\n");
+  printf("g = %Lf\n", u[0] - up[0]);
   
   printf("Bye!\n");
   
@@ -157,7 +190,7 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
     W& w = w_set[k];
 
     for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
-      long double cost = f(i, v_max, 1) + c(v_max) + compute_sum(w, d, s, v_max, u, distribution, *h);
+      long double cost = c(v_max) + compute_sum(w, d, s, v_max, u, distribution, *h);
       unsigned int p = v_max;
 
       for (unsigned int j = 0; j < v_max; j++){
@@ -165,7 +198,7 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
 	  long double c_j = c(j);
 	  if (c_j >= cost)
 	    break;
-	  long double co = f(i,j,1) + c_j + compute_sum(w, d, s, j, u, distribution, *h);
+	  long double co = c_j + compute_sum(w, d, s, j, u, distribution, *h);
 	  if (co < cost){
 	    cost = co;
 	    p = j;
