@@ -35,8 +35,11 @@ let () =
     ();
 
   (* Initialise the random number generator *)
-  if Array.length Sys.argv = 8 then
-    Random.init (int_of_string Sys.argv.(7))
+  if Array.length Sys.argv >= 8 then
+    begin
+      Printf.printf "Seed will be %d\n" (int_of_string Sys.argv.(7));
+      Random.init (int_of_string Sys.argv.(7))
+    end
   else
     Random.init (int_of_float (Unix.time ()));
 
