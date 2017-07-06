@@ -12,12 +12,12 @@
 
 /* some prototypes */
 
-double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double *u, double ***distribution, std::unordered_map<W, unsigned int> &h);
+long double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, long double *u, long double ***distribution, std::unordered_map<W, unsigned int> &h);
 
-void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double *u_n, double *u, double ***distribution, std::unordered_map<W,unsigned int> *h);
+void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, long double *u_n, long double *u, long double ***distribution, std::unordered_map<W,unsigned int> *h);
 
-double span(double *u, unsigned int space);
-double compute_span(double *u1, double *u2, unsigned int space);
+long double span(long double *u, unsigned int space);
+long double compute_span(long double *u1, long double *u2, unsigned int space);
 
 /* MAIN FUNCTION */
 
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
   /* I define all the important variables, I extract the distribution in the file given by the user and I initialize the array u */
 
   /* Defining epsilon and maximal speed */
-  double epsilon = atof(argv[1]);
+  long double epsilon = atof(argv[1]);
   unsigned int v_max = atoi(argv[2]);
 
   /* Opening the file containing the distribution and extracting deadline limit and workload limit variables, defining state space */
@@ -60,14 +60,14 @@ int main(int argc, char* argv[]){
   /* Defining the hashtable, the distribution, the w_set, the best policies array and the array of the expected consumption */
   std::unordered_map<W, unsigned int> h(space);
 
-  double ***distribution = NULL;
+  long double ***distribution = NULL;
 
-  distribution = new double**[space];
+  distribution = new long double**[space];
 
   for (unsigned int i = 0; i < space; i++){
-    distribution[i] = new double*[d];
+    distribution[i] = new long double*[d];
     for (unsigned int j = 0; j < d; j++)
-      distribution[i][j] = new double[s+1];
+      distribution[i][j] = new long double[s+1];
   }
 
   if (debug)
@@ -85,9 +85,9 @@ int main(int argc, char* argv[]){
 
   /* defining array u */
   
-  double *u = NULL, *up = NULL;
-  u = new double[space];
-  up = new double[space];
+  long double *u = NULL, *up = NULL;
+  u = new long double[space];
+  up = new long double[space];
 
   if (u == NULL){
     printf("Error: memory allocation for 'u' did not work!\n");
@@ -114,7 +114,7 @@ int main(int argc, char* argv[]){
     h[w_set[k]] = k;
     for (unsigned int i = 1; i <= d; i++)
       for (unsigned int j = 0; j <= s; j++)
-	fscanf(fd, "%lf", &distribution[k][i-1][j]);
+	fscanf(fd, "%Lf", &distribution[k][i-1][j]);
   }
 
   if (debug)
@@ -123,12 +123,12 @@ int main(int argc, char* argv[]){
   
   /* Now we can begin the main algorithm */
   std::thread threads[NB_THREADS];
-  double sp = compute_span(u, up, space);
+  long double sp = compute_span(u, up, space);
   
   while (sp > epsilon){
     if (debug)
-      printf("COMPUTATION current span = %f, epsilon = %f\n", sp, epsilon);
-    double *un = new double[space];
+      printf("COMPUTATION current span = %Lf, epsilon = %Lf\n", sp, epsilon);
+    long double *un = new long double[space];
     
     for (unsigned int k = 0; k < NB_THREADS; k++)
       threads[k] = std::thread (compute_j, w_set, k, d, s, v_max, space, un, u, distribution, &h);
@@ -149,7 +149,7 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
-void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, double *u_n, double *u, double ***distribution, std::unordered_map<W,unsigned int> *h){
+void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, unsigned int v_max, unsigned int space, long double *u_n, long double *u, long double ***distribution, std::unordered_map<W,unsigned int> *h){
   unsigned int minimum = (id_thread+1)*(space/NB_THREADS);
   if (id_thread == NB_THREADS -1)
     minimum = space;
@@ -157,15 +157,15 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
     W& w = w_set[k];
 
     for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
-      double cost = f(i, v_max, 1) + c(v_max) + compute_sum(w, d, s, v_max, u, distribution, *h);
+      long double cost = f(i, v_max, 1) + c(v_max) + compute_sum(w, d, s, v_max, u, distribution, *h);
       unsigned int p = v_max;
 
       for (unsigned int j = 0; j < v_max; j++){
 	if (j >= w.get(1)){
-	  double c_j = c(j);
+	  long double c_j = c(j);
 	  if (c_j >= cost)
 	    break;
-	  double co = f(i,j,1) + c_j + compute_sum(w, d, s, j, u, distribution, *h);
+	  long double co = f(i,j,1) + c_j + compute_sum(w, d, s, j, u, distribution, *h);
 	  if (co < cost){
 	    cost = co;
 	    p = j;
@@ -179,10 +179,10 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
 }
 
 
-double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double *u, double ***distribution, std::unordered_map<W,unsigned int> &h){
+long double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, long double *u, long double ***distribution, std::unordered_map<W,unsigned int> &h){
   w.inc_time(v);
   unsigned int id_w = h[w];
-  double sum = 0;
+  long double sum = 0;
 
   for (unsigned int i = 0; i <= s; i++){
     W wp = w;
@@ -196,8 +196,8 @@ double compute_sum(W w, unsigned int d, unsigned int s, unsigned int v, double *
   return sum;
 }
 
-double span(double *u, unsigned int space){
-  double min = u[0], max = u[0];
+long double span(long double *u, unsigned int space){
+  long double min = u[0], max = u[0];
   for (unsigned int i = 0; i < space; i++){
     min = u[i] < min ? u[i] : min;
     max = u[i] > max ? u[i] : max;
@@ -205,9 +205,9 @@ double span(double *u, unsigned int space){
   return max - min;
 }
 
-double compute_span(double *u1, double *u2, unsigned int space){
-  double *u = NULL;
-  u = new double[space];
+long double compute_span(long double *u1, long double *u2, unsigned int space){
+  long double *u = NULL;
+  u = new long double[space];
 
   if (u == NULL){
     printf("Error: failed allocation in compute_space\n");
