@@ -189,25 +189,23 @@ void compute_j(W *w_set,unsigned int id_thread, unsigned int d, unsigned int s, 
   for (unsigned int k = id_thread*(space/NB_THREADS); k < minimum; k++){ /* We explore all states */
     W& w = w_set[k];
 
-    for (unsigned int i = 0; i <= v_max; i++){ /* We explore all speeds */
-      long double cost = c(v_max) + compute_sum(w, d, s, v_max, u, distribution, *h);
-      unsigned int p = v_max;
+    long double cost = c(v_max) + compute_sum(w, d, s, v_max, u, distribution, *h);
+    unsigned int p = v_max;
 
-      for (unsigned int j = 0; j < v_max; j++){
-	if (j >= w.get(1)){
-	  long double c_j = c(j);
-	  if (c_j >= cost)
-	    break;
-	  long double co = c_j + compute_sum(w, d, s, j, u, distribution, *h);
-	  if (co < cost){
-	    cost = co;
-	    p = j;
-	  }
+    for (unsigned int j = 0; j < v_max; j++){
+      if (j >= w.get(1)){
+	long double c_j = c(j);
+	if (c_j >= cost)
+	  break;
+	long double co = c_j + compute_sum(w, d, s, j, u, distribution, *h);
+	if (co < cost){
+	  cost = co;
+	  p = j;
 	}
       }
-      unsigned int id = (*h)[w];
-      u_n[k] = cost;
     }
+    unsigned int id = (*h)[w];
+    u_n[k] = cost;
   }
 }
 
