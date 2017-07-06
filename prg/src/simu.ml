@@ -45,6 +45,8 @@ let () =
       true
     else
       false in
+  if no_overcost then
+    Printf.printf "This simulation will not take the overcost into account\n";
   
   (* Opening the files *)
   let dist' = open_in Sys.argv.(3) in
