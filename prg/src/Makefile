@@ -45,8 +45,8 @@ clemacs:
 
 tool: tool.native
 
-tool.native: math.cmx funs.cmx states.cmx toolkit.cmx
-	$(CC) math.cmx funs.cmx states.cmx toolkit.cmx -o toolkit.native
+tool.native: math.cmx fun_c.o funs.cmx states.cmx toolkit.cmx
+	$(CC) math.cmx fun_c.o funs.cmx states.cmx toolkit.cmx -o toolkit.native
 	make clean
 
 simu: simu.native
