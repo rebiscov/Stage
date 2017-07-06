@@ -71,3 +71,16 @@ simulation:
 	rm simu.native
 	mv simu.txt simu
 
+compare:
+	./proba/proba $(d) $(s) distri.txt
+	make -C c++ main
+	./c++/main $(t) $(v_max) distri.txt pol1.txt d
+	./c++/main $(t) $(v_max) distri.txt pol2.txt d no_ov
+	make -C c++ clean
+	make simu
+	./simu.native $(t) $(v_max) distri.txt pol1.txt simu1.txt $(nb_simu) $(seed)
+	./simu.native $(t) $(v_max) distri.txt pol2.txt simu2.txt $(nb_simu) $(seed) no_ov
+	rm simu.native
+	mv simu1.txt simu
+	mv simu2.txt simu
+
