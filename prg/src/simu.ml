@@ -39,6 +39,12 @@ let () =
     Random.init (int_of_string Sys.argv.(7))
   else
     Random.init (int_of_float (Unix.time ()));
+
+  let no_overcost =
+    if Array.length Sys.argv = 9 && Sys.argv.(8) = "no_ov" then
+      true
+    else
+      false in
   
   (* Opening the files *)
   let dist' = open_in Sys.argv.(3) in
@@ -110,7 +116,10 @@ let () =
       update_d work_t i delta sigma;
       S.add_work w delta sigma;
       speeds.(i) <- pol.(i).(Hashtbl.find h w).(!last_speed);
-      cost := (Funs.c speeds.(i)) +. (Funs.f !last_speed speeds.(i) i) +. !cost;
+      if no_overcost then
+        cost := (Funs.c speeds.(i)) +. !cost
+      else
+        cost := (Funs.c speeds.(i)) +. (Funs.f !last_speed speeds.(i) i) +. !cost;
       if speeds.(i) <> !last_speed && i > 0 then
         change_speed := !change_speed + 1;
       last_speed := speeds.(i);
