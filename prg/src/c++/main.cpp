@@ -33,6 +33,9 @@ int main(int argc, char* argv[]){
   if (argc >= 7)
     no_overcost = strcmp("no_ov", argv[6]) == 0;
 
+  if (no_overcost)
+    printf("The overcost will always be 0 in this simulation\n");
+
   /* I define all the important variables, I extract the distribution in the file given by the user and I initialize the array J_t^v */
 
   /* Defining time limit and maximal speed */

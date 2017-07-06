@@ -35,7 +35,10 @@ let () =
     ();
 
   (* Initialise the random number generator *)
-  Random.init (int_of_float (Unix.time ()));
+  if Array.length Sys.argv = 8 then
+    Random.init (int_of_string Sys.argv.(7))
+  else
+    Random.init (int_of_float (Unix.time ()));
   
   (* Opening the files *)
   let dist' = open_in Sys.argv.(3) in
