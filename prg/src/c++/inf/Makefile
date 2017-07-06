@@ -3,6 +3,9 @@ FLAGS=-pthread -std=c++11
 
 all: main
 
+main.o: main.cpp
+	$(CC) $(FLAGS) -c main.cpp
+
 %.o: ../%.c
 	$(CC) $(FLAGS) -c $^
 
