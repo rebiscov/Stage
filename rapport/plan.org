@@ -1,0 +1,7 @@
+* Ceci est le plan de mon rapport de stage.
+** Plan
+*** Introduction
+*** Présentation du probleme
+*** Mon probleme
+*** Solution
+*** Conclusion
