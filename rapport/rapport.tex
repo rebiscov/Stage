@@ -15,6 +15,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 %----------------------------------------------------------------------------------------
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
@@ -44,7 +45,11 @@ BCOR5mm, % Binding correction
 
 \date{} % An optional date to appear under the author(s)
 
-%----------------------------------------------------------------------------------------
+% ----------------------------------------------------------------------------------------
+
+\usepackage{tikz}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\V}{\mathcal{V}}
 
 \begin{document}
 
@@ -83,13 +88,67 @@ Nowadays, energy consumption is a major issue. Indeed, more power is
 more heat which causes a shorter life for the hardware. Obviously,
 electricity needs to be produced so it means more pollution, more
 spendings for the energy provider, the cooling devices etc... This is
-why I will now explain what my supervisor did for his research with
-other colleagues, it was my starting point for my internship.
+why my supervisor and some of his colleagues have worked on how to minimize the
+energy consumption on a processor.
 
 \subsection{A processor consumes energy}
-Let say we have a processor that needs to do some jobs. To do these
-jobs, the processor can choose severl speeds, it can go fast, slow,
-intermediate etc... 
+Let say we have a processor that has to do some work. To do it,
+the processor can choose several speeds, it can go fast, slow,
+intermediate etc... The consumption of energy will depend on the speed
+chosen by the processor and the choice of the right speed will be the
+core of the problem.
+Here, we suppose that energy is a convex function of
+the speed, nthat means that if we want to minimize the energy
+consumption, we want to use great speed as little as possible. Now, we
+want to make a mathematical model of a processor that receives tasks
+over time and executes them in time. We also want a model that works
+online. It means that the jobs are not known in advance by the
+processor. To do that, we are gonna use a Markov Decision Process to
+minimize the expected energy consumption to choose the right
+speed. Here, we study a case where the processor works until a time
+$T\in\N$, in our model, the time will be a finite set of the form
+$\{0,1,\dots,T\}$. To represent a job $j_i$, we will need a 3-tuple
+$(a_i,s_i,d_i)$ with $a_i\in\N$ the arrival time, in other words, the
+time when the processor learns the job $j_i$. $s_i\in\N$ is the
+workload (the ``amount of work''). And $d_i\in\N$ is the deadline, it
+means that the job $j_i$ has to be finished before $t=a_i+d_i$. In the
+following graph, I have represented several jobs: on the x-coordinate
+I put the interval in which the work has to be done and on the
+y-coordinate I put the workload of the jobs. For example, $j_2$ has an
+arrival time $a_2=2$, a workload $s_2=3$ and a deadline $d_2=4$. 
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[help lines] (0,0) grid (10,5);
+    \draw[<->] (0,5.5) -- (0,0) -- (10.5,0);
+    \foreach \y in {0,1,...,5} \draw (-0.25,\y) node {\y};
+    \foreach \x in {0,1,...,10} \draw (\x, -0.25) node {\x};
+    \draw (11,0) node {time};
+    \draw (0,6) node {workload};
+    \draw[|-|,cyan,thick] (1,2) -- (3,2);
+    \draw[cyan] (2,2.3) node {$j_1$};
+    \draw[|-|,red,thick] (2,3) -- (6,3);
+    \draw[red] (4,3.3) node {$j_2$};
+    \draw[|-|,brown,thick] (4,4) -- (9,4);
+    \draw[brown] (6.5,4.3) node {$j_3$};
+    \draw[|-|,purple,thick] (5,1) -- (10,1);
+    \draw[purple] (7.5,1.3) node {$j_4$};
+  \end{tikzpicture}
+\end{center}
+
+We introduce two parameters: $D$ and $S$ which will be the maximal
+deadline and the maximal workload. So, for any job
+$j_i=(a_i,s_i,d_i)$ we have $s_i\leq S$, $d_i\leq D$.
+The speeds that our processor can choose are represented by a finite
+set $\V\subset\N$. To minimize the expected energy consumption, we
+need to have some informations on the jobs that will come. We suppose
+that we know $(\phi_{\sigma,\delta})_{0\leq\sigma\leq S,0\leq\delta\leq D}$ with
+$\phi_{\sigma,\delta}$ being the probability that the job $j_i$
+arriving at time $t$ has a deadline $d_i=\delta$ and a workload
+$s_i=\sigma$. The fact that no job has arrived at time $t$ is
+represented by a workload equals to zero.
+
+\subsection{The remaining work function}
 
 
 
