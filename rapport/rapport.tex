@@ -53,7 +53,10 @@ BCOR5mm, % Binding correction
 
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\V}{\mathcal{V}}
-\newtheorem{def}{Definition}
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\W}{\mathcal{W}}
+\newcommand{\R}{\mathbb{R}}
+\newtheorem{defi}{Definition}
 
 \begin{document}
 
@@ -109,6 +112,7 @@ want to make a mathematical model of a processor that receives tasks
 over time and executes them in time. We also want a model that works
 online. It means that the jobs are not known in advance by the
 processor. To do that, we are gonna use a Markov Decision Process to
+find a policy (a strategy) and
 minimize the expected energy consumption to choose the right
 speed. Here, we study a case where the processor works until a time
 $T\in\N$, in our model, the time will be a finite set of the form
@@ -166,7 +170,7 @@ used to model longer periods of time.\\
 
 \begin{figure}
   \centering
-  \caption{A example of a MDP}
+ \caption{A example of a MDP}
   \label{fig:mdp}
   \begin{tikzpicture}
     \draw (0,0) node[circle,draw] {A};
@@ -187,8 +191,35 @@ space is \{A,B,H\}. In our problem, state space will be the space of
 the remaining functions. To execute the jobs that the processor has
 received, we are gonna use the strategy of ``Earliest Deadline
 First'', so in priority we do the jobs that needs to be done the
-sooner. From there, the only useful information is the remaining
-work. The remaining work at time $t$ is a step increasing function
+sooner. From there, the only useful information is the workload that
+has to be done over time (we do not care about scheduling). From there
+we can introduce a function: $D(\cdot)$ where $D(t)$ is the amount of
+work that must be done before time $t$. For example, on
+figure~\ref{fig:D}, I have represented the function $D(\cdot)$ in
+green for the list of jobs of the figure~\ref{fig:jobs}. We can also
+define the function $A(\cdot)$ where $A(t)$ is the amount of work that
+the processor has received at time $t$, it is represented in red on
+figure~\ref{fig:D}.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[scale=0.75]
+    \draw[help lines] (0,0) grid (10,10);
+    \foreach \x in {0,1,...,10} \draw (\x,-0.25) node {\x};
+    \foreach \y in {0,1,...,10} \draw (-0.25,\y) node {\y};
+    \draw[<->] (0,10.5) -- (0,0) -- (10.5,0);
+    \draw[green,ultra thick] (0,0) -- (3,0) -- (3,2) -- (6,2) -- (6,5)
+    -- (9,5) -- (9,9) -- (10,9) -- (10,10);
+    \draw[green] (6.5,2.5) node {$D(t)$};
+    \draw[red, ultra thick] (0,0) -- (1,0) -- (1,2) -- (2,2) -- (2,5)
+    -- (4,5) -- (4,9) -- (5,9) -- (5,10) -- (10,10);
+    \draw[red] (3.5,5.5) node {$A(t)$};
+  \end{tikzpicture}
+  \caption{Function $D(\cdot)$ and $A(\cdot)$}
+  \label{fig:D}
+\end{figure}
+
+The remaining work at time $t$ is a step increasing function
 $w_t(\cdot)$ and $w_t(u)$ is the workload that needs to be done before
 $t+u$. Because all jobs have a deadline $\Delta$, all $w_t$ are
 defined on $\llbracket 0,\Delta\rrbracket$. For example, on figure
@@ -217,6 +248,41 @@ $t=6$.
     -- (5,5);
   \end{tikzpicture}
 \end{figure}
+
+
+
+I will call the space of the remaining work functions $\W$. From state
+$w$, which state $w'\in\W$ can we obtain ? To know that, we need some
+definitions.
+
+\begin{defi}
+  $\T$ is the shift operator defined as:
+  \[ \forall x\in\R,\T f(x) = f(x+1)\]
+\end{defi}
+
+\begin{defi}
+  $H_t$ is the heavyside function defined as:
+  \[ H_t(x) =
+    \begin{cases}
+      0 & x<t \\
+      1 & x\geq t
+    \end{cases}
+  \]
+\end{defi}
+
+\begin{defi}
+  $f^+$ is the positive part of function $f$ defined as:
+  \[
+    \forall x\in\R, f^+(x)=\max(0,f(x))
+  \]
+\end{defi}
+
+Now, suppose a job $j=(a,s,d)$ arrives at time $t=a$. If the processor
+speed at time $t-1$ is $v_{t-1}$ then we have:
+\begin{equation}
+  \label{eq:nextw}
+  w_t(\cdot)=\T[(w_{t-1}(\cdot)-v_{t-1})^+]+s\times H_d(\cdot)
+\end{equation}
 
 
 \end{document}
