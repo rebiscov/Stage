@@ -48,10 +48,15 @@ BCOR5mm, % Binding correction
 % ----------------------------------------------------------------------------------------
 
 \usepackage{tikz}
+\usepackage{stmaryrd}
+\usepackage{amsthm}
+
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\V}{\mathcal{V}}
+\newtheorem{def}{Definition}
 
 \begin{document}
+
 
 %----------------------------------------------------------------------------------------
 %	HEADERS
@@ -98,7 +103,7 @@ intermediate etc... The consumption of energy will depend on the speed
 chosen by the processor and the choice of the right speed will be the
 core of the problem.
 Here, we suppose that energy is a convex function of
-the speed, nthat means that if we want to minimize the energy
+the speed, that means that if we want to minimize the energy
 consumption, we want to use great speed as little as possible. Now, we
 want to make a mathematical model of a processor that receives tasks
 over time and executes them in time. We also want a model that works
@@ -112,12 +117,15 @@ $(a_i,s_i,d_i)$ with $a_i\in\N$ the arrival time, in other words, the
 time when the processor learns the job $j_i$. $s_i\in\N$ is the
 workload (the ``amount of work''). And $d_i\in\N$ is the deadline, it
 means that the job $j_i$ has to be finished before $t=a_i+d_i$. In the
-following graph, I have represented several jobs: on the x-coordinate
+following graph, I have represented several jobs on \ref{fig:jobs}: on the x-coordinate
 I put the interval in which the work has to be done and on the
 y-coordinate I put the workload of the jobs. For example, $j_2$ has an
 arrival time $a_2=2$, a workload $s_2=3$ and a deadline $d_2=4$. 
 
-\begin{center}
+\begin{figure}
+  \centering
+  \caption{Example of jobs}
+  \label{fig:jobs}  
   \begin{tikzpicture}
     \draw[help lines] (0,0) grid (10,5);
     \draw[<->] (0,5.5) -- (0,0) -- (10.5,0);
@@ -134,22 +142,81 @@ arrival time $a_2=2$, a workload $s_2=3$ and a deadline $d_2=4$.
     \draw[|-|,purple,thick] (5,1) -- (10,1);
     \draw[purple] (7.5,1.3) node {$j_4$};
   \end{tikzpicture}
-\end{center}
+\end{figure}
 
 We introduce two parameters: $D$ and $S$ which will be the maximal
 deadline and the maximal workload. So, for any job
-$j_i=(a_i,s_i,d_i)$ we have $s_i\leq S$, $d_i\leq D$.
+$j_i=(a_i,s_i,d_i)$ we have $s_i\leq S$, $d_i\leq \Delta$.
 The speeds that our processor can choose are represented by a finite
 set $\V\subset\N$. To minimize the expected energy consumption, we
-need to have some informations on the jobs that will come. We suppose
-that we know $(\phi_{\sigma,\delta})_{0\leq\sigma\leq S,0\leq\delta\leq D}$ with
-$\phi_{\sigma,\delta}$ being the probability that the job $j_i$
-arriving at time $t$ has a deadline $d_i=\delta$ and a workload
-$s_i=\sigma$. The fact that no job has arrived at time $t$ is
-represented by a workload equals to zero.
+need to have some probability informations on the jobs that will
+come, that will be explained later.
 
 \subsection{The remaining work function}
+First, a quick reminder of what a Markov Decision Process is. MDPs are
+made to model decision making where the outcome depends on what action
+you choose and randomness. For example, I am in location A, I want to
+go to location B by taking a cab and I want to go there
+\textbf{safely}. So I will choose the cab with the well maintened car
+but my security will also depend on the sanity of the driver which
+will be determined at random. In the end, I will either end up in
+location B with probability $p_i$ or at the hospital with probability
+$1-p_i$ with. Here, we did only one choice but in general, MDPs are
+used to model longer periods of time.\\
 
+\begin{figure}
+  \centering
+  \caption{A example of a MDP}
+  \label{fig:mdp}
+  \begin{tikzpicture}
+    \draw (0,0) node[circle,draw] {A};
+    \draw[->] (0.4,0) -- (4.6,0);
+    \draw (2.5,0.5) node {choose nice car $c_i$};
+    \draw (5,0) node[circle,draw] {$c_i$};
+    \draw (7,1.5) node[circle,draw] {B};
+    \draw (7,-1.5) node[circle,draw] {H};
+    \draw[->] (5.4,0.4) -- (6.6, 1.1);
+    \draw (6,1) node {$p_i$};
+    \draw (6,-1.1) node {$1-p_i$};    
+    \draw[->] (5.4,-0.4) -- (6.6, -1.1);  
+  \end{tikzpicture}
+\end{figure}
+
+On figure~\ref{fig:mdp}, from state A we can go to B or to H, so our state
+space is \{A,B,H\}. In our problem, state space will be the space of
+the remaining functions. To execute the jobs that the processor has
+received, we are gonna use the strategy of ``Earliest Deadline
+First'', so in priority we do the jobs that needs to be done the
+sooner. From there, the only useful information is the remaining
+work. The remaining work at time $t$ is a step increasing function
+$w_t(\cdot)$ and $w_t(u)$ is the workload that needs to be done before
+$t+u$. Because all jobs have a deadline $\Delta$, all $w_t$ are
+defined on $\llbracket 0,\Delta\rrbracket$. For example, on figure
+\ref{fig:jobs}, suppose we are at $t=2$ and that our processor has not
+worked yet. We can see on the graph that $j_1$ and $j_2$ are known by
+the processor because $a_1,a_2\leq 2$. We can see the remaining work
+function on figure~\ref{fig:workfun}. The first step represents the
+workload of $j_1$ that has to be finished before $t=3$. The second
+step represents the workload of $j_2$ that has to be finished before
+$t=6$. 
+
+\begin{figure}
+  \centering
+  \caption{Remaining work function $w_2(\cdot)$.
+    Keep in mind that for $w_t(\cdot)$, $w_t(u)$ represents the
+  remaining work that has to be done at time $t+u$.}
+  \label{fig:workfun}
+  \begin{tikzpicture}
+    \draw[help lines] (0,0) grid (5,5);
+    \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+    \draw (6,0) node {time};
+    \draw (0,6) node {workload};
+    \foreach \x in {0,1,...,5} \draw (\x, -0.25) node {\x};
+    \foreach \y in {0,1,...,5} \draw (-0.25,\y) node {\y};
+    \draw[purple,ultra thick] (0,0) -- (1,0) -- (1,2) -- (4,2) -- (4,5)
+    -- (5,5);
+  \end{tikzpicture}
+\end{figure}
 
 
 \end{document}
