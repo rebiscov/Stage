@@ -385,12 +385,11 @@ To find such a policy, we use the algorithm~\ref{alg:dpa}.
     \STATE $J_{t-1}^*(w)\leftarrow
     \min\limits_{v\in\V,v\geq
       w(1)}\left(c(v)+\sum\limits_{w'\in\W}P_v(w,w')\times
-      J^*(w')\right)$
+      J_t^*(w')\right)$
     \STATE $\pi_{t-1}^*(w)\leftarrow
     \argmin\limits_{v\in\V,v\geq
       w(1)}\left(c(v)+\sum\limits_{w'\in\W}P_v(w,w')\times
-      J^*(w')\right)$
-    
+      J_t^*(w')\right)$
     \ENDFOR
     \STATE $t\leftarrow t-1$
     \ENDWHILE
@@ -399,6 +398,33 @@ To find such a policy, we use the algorithm~\ref{alg:dpa}.
 
 We use the Bellman equation to find this policy, thanks to the Markov
 Decision Process theory.
+
+\subsection{My work}
+I have implemented the algorithm~\ref{alg:dpa}. The biggest problem
+with this algorithm is the complexity of the state space. One can show
+that $|\W|=some~shit$ wich is exponential. So we need an algorithm
+that computes this set rapidly, my algorithm does it lineary.\\
+The first time I have implemented the programm, I coded in OCaml. The
+problem is that OCaml does not handle the multicore yet. You can do
+use multithreading but your programm will not be able to use several
+core (threading is just for concurrency in OCaml). Apparently this has
+to do with the garbage collector. So I coded pretty much the same
+algorithm in C++ to use multithreading.\\
+My algorithm computes the optimal policy, and then you can simulate a
+processor to test this optimal policy. To compute the optimal policy,
+you have to give several parameters like $\Delta, S,T$, the $\V$
+set and the the probabilities seen in~\ref{eq:prob}.
+You can see an example of the simulation on
+figure~\ref{fig:simu}. The blue line is the work done by the
+processor, while the orange line is the $D(\cdot)$ function. I have
+tested with the cost function $c(v)=v^2$.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.4]{example_simu.png}
+  \caption{Simulation of a processor. Here $T=30,\Delta=4,S=3$}
+  \label{fig:simu}
+\end{figure}
 
 \subsection{Conclusion}
 
@@ -413,6 +439,102 @@ that would take into acount this cost.
 The problem with the model is that it did not care about the cost of
 changing speed. My job was to solve that. First, we supposed that if
 $v_1\neq v_2$, then the time to change speed was $\tau$. It means that
-the processor is unable to work during a time $tau$.
+the processor is unable to work during a time $\tau$ like the example
+on figure~\ref{fig:delay}.
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \draw[help lines] (0,0) grid (5,5);
+    \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+    \draw[thick,blue] (0,0) -- (2,3) -- (2.7,3) -- (5,4);
+    \draw (0,6) node {amount of work done};
+    \draw (6,0) node {time};
+    \draw[blue] (0.5,1.5) node {$v_1$};
+    \draw[blue] (3.5,3.7) node {$v_2$};
+    \draw[|-|,red,thick] (2,3.1) -- (2.7, 3.1);
+    \draw[red] (2.35,3.5) node {$\tau$};
+  \end{tikzpicture}
+  \caption{$\tau$ delay}
+  \label{fig:delay}
+\end{figure}
+
+We want to update our model but to keep it simple too. What we are
+going to do is model the change of speed by an overcost. Pay attention
+to figure~\ref{fig:overcost}. What we want is to end up in the same
+situation that in the model without the cost of changing speed. In the
+case $v_1>v_2$ the blue line represents the case where changing speed
+costs and the green line represents the standard case. We can see
+that, to compensate the fact that we lost a time $\tau$, we stayed at
+speed $v_1$ to compensate. Because the $c(\cdot)$ consumption function
+is convex, this will result in an overcost. Same case for $v_1<v_2$.\\
+
+The value of the overcost is:
+\begin{equation}
+  \label{eq:overcost}
+  f(v_1,v_2)=
+  \begin{cases}
+    0 & \mbox{if } v_1=v_2 \\
+    \delta\times c(v_1) - (\tau + \delta)\times c(v_2) & \mbox{if }
+    v_1>v_2 \\
+    \delta\times c(v_2) - (\tau + \delta)\times c(v_1) & \mbox{if }
+    v_1<v_2
+  \end{cases}
+\end{equation}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \draw (2.5, 5.5) node {$v1 > v_2$};
+    \draw[help lines] (0,0) grid (5,5);
+    \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+    \draw[blue,thick] (1,0) -- (2.15,3.45);
+    \draw[red,ultra thick] (2.15,3.45) -- (2.45, 3.45);
+    \draw[blue,thick](2.45, 3.45) -- (4,5);
+  \end{tikzpicture}
+  \begin{tikzpicture}
+    \draw (2.5, 5.5) node {$v1 < v_2$};
+    \draw[help lines] (0,0) grid (5,5);
+    \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+  \end{tikzpicture}
+  \caption{Change of speed}
+  \label{fig:overcost}
+\end{figure}
+
+\subsection{The new algorithm}
+We some little changes we can adapt our algorithm so it will work also
+with the changing speeds. But first, we need to define $\pi_t^v(w)$ and
+$J_t^v(w)$.\\
+
+\begin{defi}
+  $\pi$ is a policy and $\pi_t^v(w)\in\V$ is the speed to choose when
+  you are at state $w$, time $t$ and your speed at $t-1$ was $v$.
+\end{defi}
+
+\begin{defi}
+  $J_t^v(w)$ is the expected consumption from state $w$ and time $t$,
+  knowing that the speed at time $t-1$ was $v$ with policy $\pi$.
+\end{defi}
+
+Knowing that, we get our new algorithm~\ref{alg:chgspdalgo}.
+
+\begin{algorithm}
+  \caption{Dynamic Algorithm with changing speed}
+  \label{alg:chgspdalgo}  
+  \begin{algorithmic}
+    \STATE $t\leftarrow T$
+    \FORALL{$w\in\W,v\in\V$}
+    \STATE $J_T^v(w)\leftarrow0$
+    \ENDFOR
+    \WHILE{$t\geq1$}
+    \FORALL{$w\in\W,v\in\V$}
+    \STATE $J_{t-1}^v(w)\leftarrow \min\limits_{u\in\V,u\geq w(1)}
+    c(u)+f(v,u)+\sum\limits_{w'\in\W}J_t^u(w')\times P_u(w,w')$
+    \STATE $\pi_{t-1}^v(w)\leftarrow \argmin\limits_{u\in\V,u\geq w(1)}
+    c(u)+f(v,u)+\sum\limits_{w'\in\W}J_t^u(w')\times P_u(w,w')$    
+    \ENDFOR
+    \STATE $t\leftarrow t-1$
+    \ENDWHILE
+  \end{algorithmic}
+\end{algorithm}
 
 \end{document}
