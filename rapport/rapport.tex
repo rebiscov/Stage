@@ -61,6 +61,7 @@ BCOR5mm, % Binding correction
 \newcommand{\W}{\mathcal{W}}
 \newcommand{\R}{\mathbb{R}}
 \newtheorem{defi}{Definition}
+\newtheorem{theo}{Theorem}
 
 \begin{document}
 
@@ -89,18 +90,18 @@ I did my internship at the Inria Grenoble and the subject was:
 \textit{"Optimisation avec incertitudes: application à la gestion
   énergétique"} and it lasted 6 weeks. My supervisor was Bruno Gaujal
 from  Inria. Here, I will present what was the general problem. Then,
-I will discuss what I have done, which was a generalization of the
-problem.
+I will discuss what I have done, which was a generalisation of the
+problem. 
 
 
 \newpage % Start the article content on the second page, remove this if you have a longer abstract that goes onto the second page
 
 \section{A presentation of the problem}
 Nowadays, energy consumption is a major issue. Indeed, more power is
-more heat which causes a shorter life for the hardware. Obviously,
+more heat which causes a shorter lifetime for the hardware. Obviously,
 electricity needs to be produced so it means more pollution, more
-spendings for the energy provider, the cooling devices etc... This is
-why my supervisor and some of his colleagues have worked on how to minimize the
+spending in energy, in cooling... This is
+why my supervisor and some of his colleagues have worked on how to minimise the
 energy consumption on a processor.
 
 \subsection{A processor consumes energy}
@@ -110,25 +111,31 @@ intermediate etc... The consumption of energy will depend on the speed
 chosen by the processor and the choice of the right speed will be the
 core of the problem.
 Here, we suppose that energy is a convex function of
-the speed, that means that if we want to minimize the energy
+the speed, it means that if we want to minimise the energy
 consumption, we want to use great speed as little as possible. Now, we
 want to make a mathematical model of a processor that receives tasks
 over time and executes them in time. We also want a model that works
 online. It means that the jobs are not known in advance by the
-processor. To do that, we are gonna use a Markov Decision Process to
+processor.\\
+
+To do that, we are gonna use a Markov Decision Process to
 find a policy (a strategy) and
-minimize the expected energy consumption to choose the right
-speed. Here, we study a case where the processor works until a time
+minimise the \textbf{expected} energy consumption to choose the right
+speed. Indeed, MDPs work with probabilities.
+Here, we study a case where the processor works until a time
 $T\in\N$, in our model, the time will be a finite set of the form
 $\{0,1,\dots,T\}$. To represent a job $j_i$, we will need a 3-tuple
 $(a_i,s_i,d_i)$ with $a_i\in\N$ the arrival time, in other words, the
-time when the processor learns the job $j_i$. $s_i\in\N$ is the
-workload (the ``amount of work''). And $d_i\in\N$ is the deadline, it
-means that the job $j_i$ has to be finished before $t=a_i+d_i$. On the
+time when the job $j_i$ arrives and is acknowledged by the processor. $s_i\in\N$ is the
+workload (the ``amount of work''). And $d_i\in\N$ is the deadline
+which is the time given to the processor to finish the work,
+it means that the job $j_i$ has to be finished before $t=a_i+d_i$. On the
 figure~\ref{fig:jobs}, I have represented several jobs: on the x-coordinate
 I put the interval in which the work has to be done and on the
 y-coordinate I put the workload of the jobs. For example, $j_2$ has an
-arrival time $a_2=2$, a workload $s_2=3$ and a deadline $d_2=4$. 
+arrival time $a_2=2$, a workload $s_2=3$ and a deadline
+$d_2=4$. Please note that all our parameters are natural numbers so it
+stays simple.\\
 
 \begin{figure}
   \centering
@@ -156,8 +163,8 @@ We introduce two parameters: $\Delta$ and $S$ which will be the maximal
 deadline and the maximal workload. So, for any job
 $j_i=(a_i,s_i,d_i)$ we have $s_i\leq S$, $d_i\leq \Delta$.
 The speeds that our processor can choose are represented by a finite
-set $\V\subset\N$. To minimize the expected energy consumption, we
-need to have some probability informations on the jobs that will
+set $\V\subset\N$. To minimise the expected energy consumption, we
+need to have some probabilities on the jobs that will
 come, it will be explained later.
 
 \subsection{The remaining work function}
@@ -165,8 +172,8 @@ To execute the jobs that the processor has
 received, we are gonna use the strategy of ``Earliest Deadline
 First'', so in priority we do the jobs that needs to be done the
 sooner. From there, the only useful information is the workload that
-has to be done over time (we do not care about scheduling). From there
-we can introduce a function: $D(\cdot)$ where $D(t)$ is the amount of
+has to be done over time (we do not care about scheduling). 
+We can introduce a function: $D(\cdot)$ where $D(t)$ is the amount of
 work that must be done before time $t$. For example, on
 figure~\ref{fig:D}, I have represented the function $D(\cdot)$ in
 green for the list of jobs of the figure~\ref{fig:jobs}. We can also
@@ -176,20 +183,20 @@ figure~\ref{fig:D} The formal definitions of $D(\cdot)$ and $A(\cdot)$
 are, if we have $n$ jobs $(a_i,s_i,d_i)$:
 \begin{equation}
   \label{eq:D}
-  D(t) = \sum_{i=1}^ns_i\times\mathbb{1}_{[a_i<t]}
+  D(t) = \sum_{i=1}^ns_i\times\mathbb{1}_{[a_i+d_i<t]}
 \end{equation}
 
 \begin{equation}
   \label{eq:A}
-  A(t) = \sum_{i=1}^ns_i\times\mathbb{1}_{[d_i\leq t]}
+  A(t) = \sum_{i=1}^ns_i\times\mathbb{1}_{[a_i\leq t]}
 \end{equation}
 
 Moreover, I have represented the function $e(t)$
-where $e(t)$ is the work that has been done at time $t$. So, we
-obvisously have $D(t)\leq e(t)\leq A(t)$. The slope of the function
+where $e(\cdot)$ is the work that has been done at time $t$. So, we
+obviously have $D(t)\leq e(t)\leq A(t)$. The slope of the function
 $e(\cdot)$ between $t$ and $t+1$ is $v_t$, the speed of the
-processor chosen at time $t$. The problem is to find an oneline
-algorithm that find the function $e(\cdot)$ while minimizing the
+processor chosen at time $t$. The problem is to find an online
+algorithm that finds the function $e(\cdot)$ while minimising the
 expected consumption.\\
 
 \begin{figure}
@@ -217,11 +224,11 @@ First, a quick reminder of what a Markov Decision Process is. MDPs are
 made to model decision making where the outcome depends on what action
 you choose and randomness. For example, I am in location A, I want to
 go to location B by taking a cab and I want to go there
-\textbf{safely}. So I will choose the cab with the well maintened car
+\textbf{safely}. So I will choose the cab with the well maintained car
 but my security will also depend on the sanity of the driver which
 will be determined at random. In the end, I will either end up in
 location B with probability $p_i$ or at the hospital with probability
-$1-p_i$ with. Here, we did only one choice but in general, MDPs are
+$1-p_i$. Here, we did only one choice but in general, MDPs are
 used to model longer periods of time.\\
 
 \begin{figure}
@@ -246,8 +253,8 @@ On figure~\ref{fig:mdp}, from state A we can go to B or to H, so our state
 space is \{A,B,H\}. In our problem, state space will be the space of
 the remaining functions. 
 The remaining work at time $t$ is a step increasing function
-$w_t(\cdot)$ and $w_t(u)$ is the workload that needs to be done before
-$t+u$. Because all jobs have a deadline $\Delta$, all $w_t$ are
+$w_t(\cdot)$ and $w_t(u)$ is the remaining workload that needs to be done before
+$t+u$. Because all jobs have a deadline bounded by $\Delta$, all $w_t$ are
 defined on $\llbracket 0,\Delta\rrbracket$. For example, on figure
 \ref{fig:jobs}, suppose we are at $t=2$ and that our processor has not
 worked yet. We can see on the graph that $j_1$ and $j_2$ are known by
@@ -270,8 +277,12 @@ $t=6$.
     \draw (0,6) node {workload};
     \foreach \x in {0,1,...,5} \draw (\x, -0.25) node {\x};
     \foreach \y in {0,1,...,5} \draw (-0.25,\y) node {\y};
-    \draw[purple,ultra thick] (0,0) -- (1,0) -- (1,2) -- (4,2) -- (4,5)
-    -- (5,5);
+    \draw[purple,ultra thick] (0,0) -- (1,0) -- (1,2) -- (4,2) --
+    (4,5) -- (5,5);
+    \draw[green,dashed,ultra thick,|-|] (0.90, 0) -- (0.90,2);
+    \draw[green] (3.5, 3.5) node {$j_2$};
+    \draw[green,dashed,ultra thick,|-|] (3.90, 2) -- (3.90,5);
+    \draw[green] (0.5, 1.5) node {$j_1$};    
   \end{tikzpicture}
 \end{figure}
 
@@ -310,24 +321,32 @@ speed at time $t-1$ is $v_{t-1}$ then we have:
   w_t(\cdot)=\T[(w_{t-1}(\cdot)-v_{t-1})^+]+s\times H_d(\cdot)
 \end{equation}
 
+Once the processor picks the speed $v_{t-1}$, during one unit of time,
+the processor will do $v_{t-1}$ amount of work work so we can
+substract $v_{t-1}$ from
+$w_{t-1}$, but the remaining work function must be positive by
+definition, hence the term $\T[(w_{t-1}(\cdot)-v_{t-1})^+]$. Then the
+term $s\times H_d$ represents the work which was released at time
+$t$ and that must be done before time $t+d$.\\
+
 Once the speed at $t-1$ has been chosen, the number of state
 accessible is not big, it only depends on what job the processor will
 receive at time $t$. Because deadlines are bounded by $\Delta$ and
 workload by $S$, we have $(S+1)\times\Delta$ possibilities. Indeed, we
 have the deadline $d\in\{1,\dots, \Delta\}$ and the workload
 $s\in\{0,\dots, S\}$ (the fact that no jobs arrive at time $t$ is
-represented by an amount of work null.
+represented by a null amount of work.
 
 \subsection{Finding the right policy}
 Now, what we want to find is, given a remaining work function and a
-time $t$, what is the right speed to choose to minimize the expected
+time $t$, what is the right speed to choose to minimise the expected
 consumption. But first, we need probabilities about the jobs that can
 arrive. We suppose we know $(\phi_w(\cdot,\cdot))_{w\in\W})$ such that:
 \begin{equation}
   \label{eq:prob}
-  \phi_w(\sigma, \delta)=\Pr(st=s,d_t=\delta|w_t=w)
+  \phi_w(\sigma, \delta)=\Pr(s_t=s,d_t=\delta|w_t=w)
 \end{equation}
-In words, $\phi_w(\sigma,\delta)$ is the probability that at state
+In other words, $\phi_w(\sigma,\delta)$ is the probability that at state
 $w$, a job with a workload $\sigma$ and a deadline $\delta$
 arrives. We can now define $P_v(w,w')$ which is the probability that,
 if at $t-1$ you are at state $w$ and at speed $v$, to go to state $w'$
@@ -344,7 +363,7 @@ at time $t$. So we have the equation:
 
 
 To introduce the algorithm that will allow us to solve the problem, we
-need to introduce two more functions.
+need to define two more functions.
 
 \begin{defi}
   A policy $\pi(\cdot,\cdot)$ is a function such that
@@ -371,7 +390,10 @@ With $J^*$ being the optimal expected consumption, $w_0$ being the
 initial state and $c(v)$ being the consumption of the processor when
 going to speed $v$\\
 
-To find such a policy, we use the algorithm~\ref{alg:dpa}.
+Thanks to the Markov Decision Process Theory and by using the Bellman
+equation, we can find the right policy by using the
+algorithm~\ref{alg:dpa}.\\
+
 \begin{algorithm}
   \caption{Dynamic Programming Algorithm to find the optimal policy}
   \label{alg:dpa}
@@ -394,19 +416,32 @@ To find such a policy, we use the algorithm~\ref{alg:dpa}.
     \STATE $t\leftarrow t-1$
     \ENDWHILE
   \end{algorithmic}
+  
 \end{algorithm}
 
-We use the Bellman equation to find this policy, thanks to the Markov
-Decision Process theory.
+\begin{theo}
+  The size state space the state space is
+  \[
+    |\W|=
+  \]
+\end{theo}
+\\
+
+\begin{theo}
+  The complexity of the algorithm is
+  \[
+    v_t
+  \]
+\end{theo}
 
 \subsection{My work}
 I have implemented the algorithm~\ref{alg:dpa}. The biggest problem
 with this algorithm is the complexity of the state space. One can show
-that $|\W|=some~shit$ wich is exponential. So we need an algorithm
-that computes this set rapidly, my algorithm does it lineary.\\
-The first time I have implemented the programm, I coded in OCaml. The
+that $|\W|=some~shit$ which is exponential. So we need an algorithm
+that computes this set rapidly, my algorithm does it linearly.\\
+The first time I have implemented the programme, I coded in OCaml. The
 problem is that OCaml does not handle the multicore yet. You can do
-use multithreading but your programm will not be able to use several
+use multithreading but your programme will not be able to use several
 core (threading is just for concurrency in OCaml). Apparently this has
 to do with the garbage collector. So I coded pretty much the same
 algorithm in C++ to use multithreading.\\
@@ -428,12 +463,12 @@ tested with the cost function $c(v)=v^2$.
 
 \subsection{Conclusion}
 
-We have now resolved our problem to minimize the expected consumption
+We have now resolved our problem to minimise the expected consumption
 of our processor. But in our model, we can change speed instantly. In
 reality, this has a cost and my part was to model and make a algorithm
-that would take into acount this cost.
+that would take into account this cost.
 
-\section{Generalization of the problem}
+\section{Generalisation of the problem}
 
 \subsection{Weakness of our model}
 The problem with the model is that it did not care about the cost of
@@ -466,7 +501,11 @@ case $v_1>v_2$ the blue line represents the case where changing speed
 costs and the green line represents the standard case. We can see
 that, to compensate the fact that we lost a time $\tau$, we stayed at
 speed $v_1$ to compensate. Because the $c(\cdot)$ consumption function
-is convex, this will result in an overcost. Same case for $v_1<v_2$.\\
+is convex, this will result in an overcost. Same case for
+$v_1<v_2$. Note that in case 2, the decision to change speed should be
+at time $t$ but we have changed speed a little before to compensate
+the loss of time $\tau$ but for the sake of simplicity, we will
+suppose that this is not a problem.
 
 The value of the overcost is:
 \begin{equation}
@@ -489,12 +528,25 @@ The value of the overcost is:
     \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
     \draw[blue,thick] (1,0) -- (2.15,3.45);
     \draw[red,ultra thick] (2.15,3.45) -- (2.45, 3.45);
+    \draw[red] (2.30, 3.6) node {$\tau$};
     \draw[blue,thick](2.45, 3.45) -- (4,5);
+    \draw[green, thick,dashed] (1,0) -- (2,3) -- (4,5);
+    \draw (2,-0.25) node {$t$};
+    \draw (3,-0.25) node {$t+1$};
+    \draw[purple,dashed,thick] (2,5) -- (2,0);    
   \end{tikzpicture}
   \begin{tikzpicture}
     \draw (2.5, 5.5) node {$v1 < v_2$};
     \draw[help lines] (0,0) grid (5,5);
     \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+    \draw[blue,thick] (1,0) -- (2.55,1.55);
+    \draw[red,ultra thick] (2.55,1.55) -- (2.85,1.55);
+    \draw[blue,thick] (2.85,1.55) -- (4,5);
+    \draw[green, thick,dashed] (1,0) -- (3,2) -- (4,5);
+    \draw[red] (2.70, 1.40) node {$\tau$};
+    \draw (3,-0.25) node {$t$};
+    \draw (4,-0.25) node {$t+1$};
+    \draw[purple,dashed,thick] (3,5) -- (3,0);
   \end{tikzpicture}
   \caption{Change of speed}
   \label{fig:overcost}
@@ -536,5 +588,28 @@ Knowing that, we get our new algorithm~\ref{alg:chgspdalgo}.
     \ENDWHILE
   \end{algorithmic}
 \end{algorithm}
+
+\subsection{Results}
+
+My simulator works as follows: you give it the probabilities
+$(\phi_{\delta,\sigma})_{1\leq\delta\leq \Delta,0\leq\sigma\leq S}$, a
+time $T$ and at for $t=0$ to $T-1$, the
+simulator will pick a job with a workload $s$ and deadline $d$
+according to $\phi$. Then, the programme computes the new state $w\in\W$
+and with the pre calculated policy, the simulator choose the right
+speed to use. I also compared the case where you have an overcost and
+the case where you don't and you can see it on
+figure~\ref{fig:algo_overcost}.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.4]{example_compare.png}
+  \caption{Comparison of the standard case (orange line) and the one
+    with overcost (blue line). $T=30,\Delta=4,S=3$}
+  \label{fig:algo_overcost}
+\end{figure}
+
+\section{Infinite case}
+Tu connais les bails
 
 \end{document}
