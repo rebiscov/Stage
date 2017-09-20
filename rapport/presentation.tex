@@ -1,0 +1,438 @@
+\documentclass{beamer}
+%
+% Choose how your presentation looks.
+%
+% For more themes, color themes and font themes, see:
+% http://deic.uab.es/~iblanes/beamer_gallery/index_by_theme.html
+%
+\mode<presentation>
+{
+  \usetheme{default}      % or try Darmstadt, Madrid, Warsaw, ...
+  \usecolortheme{default} % or try albatross, beaver, crane, ...
+  \usefonttheme{default}  % or try serif, structurebold, ...
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+} 
+
+\usepackage[francais]{babel}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{tikz}
+\usepackage{stmaryrd}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\lcm}{lcm}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\Sp}{\mathcal{S}}
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\W}{\mathcal{W}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+\title[Stage Inria]{Optimisation avec incertitudes: application à la gestion
+  énergétique}
+\author{Vincent RÉBISCOUL}
+\institute{École Normale Supérieure de Lyon}
+\date{Mardi 5 Septembre 2017}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+\begin{frame}{Plan\textsc{}}
+  \tableofcontents
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+
+  Nous avons un processeur et nous voulons optimiser sa consommation.
+
+  \begin{itemize}
+  \item Coût de l'énergie
+  \item Coût du refroidissement
+  \item Pollution
+  \item Amélioration de la longévité de l'équipement
+  \end{itemize}
+  
+  \begin{figure}
+    \centering
+    \includegraphics[scale=0.1]{fan.jpg}
+  \end{figure}
+\end{frame}
+
+\section{Premier modèle}
+
+\subsection{Les "jobs"}
+
+\begin{frame}{Jobs}
+  $j_i=(a_i,s_i,d_i)\in\N^3$
+  \begin{itemize}
+  \item $a_i$ le temps d'arrivée
+  \item $s_i$ la charge de travail
+  \item $d_i$ le temps donné pour effectuer le travail
+  \end{itemize}
+
+  $\forall j_i$, $d_i\leq\Delta$ et
+  $s_i\leq S$
+  
+  \begin{figure}
+  \centering
+  \caption{Exemple de ``jobs''}
+  \label{fig:jobs}  
+  \begin{tikzpicture}[scale=0.7]
+    \draw[help lines] (0,0) grid (10,5);
+    \draw[<->] (0,5.5) -- (0,0) -- (10.5,0);
+    \foreach \y in {0,1,...,5} \draw (-0.25,\y) node {\y};
+    \foreach \x in {0,1,...,10} \draw (\x, -0.25) node {\x};
+    \draw (11,0) node {time};
+    \draw (0,6) node {workload};
+    \draw[|-|,cyan,thick] (1,2) -- (3,2);
+    \draw[cyan] (2,2.3) node {$j_1$};
+    \draw[|-|,red,thick] (2,3) -- (6,3);
+    \draw[red] (4,3.3) node {$j_2$};
+    \draw[|-|,brown,thick] (4,4) -- (9,4);
+    \draw[brown] (6.5,4.3) node {$j_3$};
+    \draw[|-|,purple,thick] (5,1) -- (10,1);
+    \draw[purple] (7.5,1.3) node {$j_4$};
+  \end{tikzpicture}
+\end{figure}
+\end{frame}
+
+\subsection{Quelques définitions}
+
+\begin{frame}{Définitions}
+  \begin{itemize}
+  \item $\V\subset\N$ est l'ensemble des vitesses
+  \item $T$ est le temps de travail
+  \item $D(t)$ la fonction du travail à faire
+  \item $A(t)$ la fonction du travail arrivé
+  \item $\phi_w(\sigma,\delta)$
+  \item $\W$ l'ensemble des fonctions de travail restant
+  \end{itemize}
+
+  \begin{figure}
+    \centering
+    \includegraphics[scale=.15]{dico.jpg}
+  \end{figure}
+
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}[scale=0.75]
+      \draw[help lines] (0,0) grid (10,10);
+      \foreach \x in {0,1,...,10} \draw (\x,-0.25) node {\x};
+      \foreach \y in {0,1,...,10} \draw (-0.25,\y) node {\y};
+      \draw[<->] (0,10.5) -- (0,0) -- (10.5,0);
+      \draw[green,ultra thick] (0,0) -- (3,0) -- (3,2) -- (6,2) -- (6,5)
+      -- (9,5) -- (9,9) -- (10,9) -- (10,10);
+      \draw[green] (6.5,2.5) node {$D(t)$};
+      \draw[red, ultra thick] (0,0) -- (1,0) -- (1,2) -- (2,2) -- (2,5)
+      -- (4,5) -- (4,9) -- (5,9) -- (5,10) -- (10,10);
+      \draw[red] (3.5,5.5) node {$A(t)$};
+      \draw[blue,thick] (0,0) -- (1,0) -- (3,2) -- (4,4) -- (5,5) -- (6,7) -- (7,7)
+      -- (8, 9) -- (9,9) -- (10,10);
+      \draw[blue] (6.5, 7.5) node {$e(t)$};
+    \end{tikzpicture}
+    \caption{Les fonctions $D(\cdot)$ et $A(\cdot)$}
+    \label{fig:D}
+  \end{figure}  
+  
+\end{frame}
+
+\subsection{La fonction de travail restant}
+
+\begin{frame}
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}[scale=0.65]
+    \draw[help lines] (0,0) grid (5,5);
+    \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+    \draw (6,0) node {time};
+    \draw (-2,4) node {workload};
+    \foreach \x in {0,1,...,5} \draw (\x, -0.25) node {\x};
+    \foreach \y in {0,1,...,5} \draw (-0.25,\y) node {\y};
+    \draw[purple,ultra thick] (0,0) -- (1,0) -- (1,2) -- (4,2) --
+    (4,5) -- (5,5);
+    \draw[green,dashed,ultra thick,|-|] (0.90, 0) -- (0.90,2);
+    \draw[green] (3.5, 3.5) node {$j_2$};
+    \draw[green,dashed,ultra thick,|-|] (3.90, 2) -- (3.90,5);
+    \draw[green] (0.5, 1.5) node {$j_1$};    
+  \end{tikzpicture}
+  \begin{tikzpicture}[scale=0.65]
+    \draw[help lines] (0,0) grid (10,5);
+    \draw[<->] (0,5.5) -- (0,0) -- (10.5,0);
+    \foreach \y in {0,1,...,5} \draw (-0.25,\y) node {\y};
+    \foreach \x in {0,1,...,10} \draw (\x, -0.25) node {\x};
+    \draw (11,0) node {time};
+    \draw (-2,4) node {workload};
+    \draw[|-|,cyan,thick] (1,2) -- (3,2);
+    \draw[cyan] (1.5,2.3) node {$j_1$};
+    \draw[|-|,red,thick] (2,3) -- (6,3);
+    \draw[red] (4,3.3) node {$j_2$};
+    \draw[|-|,brown,thick] (4,4) -- (9,4);
+    \draw[brown] (6.5,4.3) node {$j_3$};
+    \draw[|-|,purple,thick] (5,1) -- (10,1);
+    \draw[purple] (7.5,1.3) node {$j_4$};
+    \draw[green,dashed,thick] (2,0) -- (2,5);
+  \end{tikzpicture}
+    \caption{La fonction de travail restant}
+    \label{fig:remaining_work}
+  \end{figure}
+\end{frame}
+
+\subsection{Politique}
+\begin{frame}{Politique}
+  \begin{block}{Politique}
+    Un politique $\pi(\cdot,\cdot)$ est une fonction tel que
+    \[
+      \pi:\W\times \{0,\dots,T\}\rightarrow\V
+    \]
+  \end{block}
+
+  \begin{block}{$J_t(w)$}
+    $J_t(w)$ est la consommation moyenne étant donné une politique
+    $\pi(\cdot,\cdot)$ à l'instant $t$ et à l'état $w$.\\
+    \[
+      J_t(w)=\mathbb{E}\sum_{s=t}^Tc(\pi(w_s,s))
+    \]
+    avec $w_t=w$
+  \end{block}
+  
+\end{frame}
+
+\subsection{L'algorithme}
+
+\begin{frame}{L'algorithme}
+  \begin{algorithm}[H]
+    \caption{Algorithme de programmation dynamique pour trouver la
+      politique optimale}
+    \label{alg:dpa}
+    \begin{algorithmic}
+      \STATE $t\leftarrow T$
+      \FORALL{$w\in\W$}
+      \STATE $J_T^*(w)\leftarrow 0$
+      \ENDFOR
+      \WHILE{$t\geq 1$}
+      \FORALL{$w\in\W$}
+      \STATE $J_{t-1}^*(w)\leftarrow
+      \min\limits_{v\in\V,v\geq
+        w(1)}\left(c(v)+\sum\limits_{w'\in\W}P_v(w,w')\times
+        J_t^*(w')\right)$
+      \STATE $\pi_{t-1}^*(w)\leftarrow
+      \argmin\limits_{v\in\V,v\geq
+        w(1)}\left(c(v)+\sum\limits_{w'\in\W}P_v(w,w')\times
+        J_t^*(w')\right)$
+      \ENDFOR
+      \STATE $t\leftarrow t-1$
+      \ENDWHILE
+      \RETURN $\pi^*$
+    \end{algorithmic}
+  \end{algorithm}
+  
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+    \centering
+    \includegraphics[scale=.4]{example_simu.png}
+    \caption{Simulation d'un politique optimale}
+    \label{fig:exemple}
+  \end{figure}
+\end{frame}
+
+\section{Généralisation du problème}
+
+\subsection{Changement de vitesse}
+
+\begin{frame}
+  Ce modèle ne prend pas en compte le changement de vitesse
+
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}
+      \draw[help lines] (0,0) grid (5,5);
+      \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+      \draw[thick,blue] (0,0) -- (2,3) -- (2.7,3) -- (5,4);
+      \draw (0,6) node {charge de travail};
+      \draw (6,0) node {temps};
+      \draw[blue] (0.5,1.5) node {$v_1$};
+      \draw[blue] (3.5,3.7) node {$v_2$};
+      \draw[|-|,red,thick] (2,3.1) -- (2.7, 3.1);
+      \draw[red] (2.35,3.5) node {$\tau$};
+    \end{tikzpicture}
+    \caption{Changement de vitesse}
+    \label{fig:chg_speed}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+    \begin{tikzpicture}
+      \draw (2.5, 5.5) node {$v1 > v_2$};
+      \draw[help lines] (0,0) grid (5,5);
+      \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+      \draw[blue,thick] (1,0) -- (2.15,3.45);
+      \draw[red,ultra thick] (2.15,3.45) -- (2.45, 3.45);
+      \draw[red] (2.30, 3.6) node {$\tau$};
+      \draw[blue,thick](2.45, 3.45) -- (4,5);
+      \draw[green, thick,dashed] (1,0) -- (2,3) -- (4,5);
+      \draw (2,-0.25) node {$t$};
+      \draw (3,-0.25) node {$t+1$};
+      \draw[purple,dashed,thick] (2,5) -- (2,0);
+      \draw[purple,dashed,thick] (2.15,5) -- (2.15,0);
+      \draw[red] (2.5,1.5) node {$\delta$};
+      \draw[red,ultra thick] (2.0,1.5) -- (2.15,1.5);
+    \end{tikzpicture}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+
+    \begin{tikzpicture}
+      \draw (2.5, 5.5) node {$v1 < v_2$};
+      \draw[help lines] (0,0) grid (5,5);
+      \draw[<->] (0,5.5) -- (0,0) -- (5.5,0);
+      \draw[blue,thick] (1,0) -- (2.55,1.55);
+      \draw[red,ultra thick] (2.55,1.55) -- (2.85,1.55);
+      \draw[blue,thick] (2.85,1.55) -- (4,5);
+      \draw[green, thick,dashed] (1,0) -- (3,2) -- (4,5);
+      \draw[red] (2.70, 1.40) node {$\tau$};
+      \draw (3,-0.25) node {$t$};
+      \draw (4,-0.25) node {$t+1$};
+      \draw[purple,dashed,thick] (3,5) -- (3,0);
+    \end{tikzpicture}
+  \end{figure}
+\end{frame}
+
+\subsection{Surcoût}
+
+\begin{frame}{Surcoût}
+  $c(\cdot)$, la fonction de consommation est convexe. La situation
+  précédente entraîne donc un surcoût.
+
+  \begin{equation}
+    \label{eq:overcost}
+    f(v_1,v_2)=
+    \begin{cases}
+      0 & \mbox{if } v_1=v_2 \\
+      \delta\times c(v_1) - (\tau + \delta)\times c(v_2)+\tau\times c(0) & \mbox{si }
+      v_1>v_2 \\
+      \delta\times c(v_2) - (\tau + \delta)\times c(v_1)+\tau\times c(0) & \mbox{si }
+      v_1<v_2
+    \end{cases}
+  \end{equation}
+\end{frame}
+
+\subsection{Politique}
+
+\begin{frame}
+  \begin{block}{Politique}
+    $\pi$ est une politique et $\pi_t^v(w)\in\V$ est la vitesse
+    choisie lorsque l'on est à l'état $w$, à l'instant $t$ et que la
+    vitesse à $t-1$ était $v$
+  \end{block}
+
+  \begin{block}{$J_t^v(w)$}
+    $J_t^v(w)$ est la consommation moyenne lorsque l'on suit la
+    politique $pi$, que l'on est à l'état $w$, à l'instant $t$ et que
+    la vitesse à $t-1$ était $v$
+  \end{block}
+  
+\end{frame}
+
+\subsection{Nouvel algorithme}
+
+\begin{frame}{Nouvel algorithme}
+  \begin{algorithm}[H]
+    \caption{Algorithme dynamique de recherche d'une politique optimale
+    prenant en compte le coût du changement de vitesse}
+    \label{alg:chgspdalgo}  
+    \begin{algorithmic}
+      \STATE $t\leftarrow T$
+      \FORALL{$w\in\W,v\in\V$}
+      \STATE $J_T^v(w)\leftarrow0$
+      \ENDFOR
+      \WHILE{$t\geq1$}
+      \FORALL{$w\in\W,v\in\V$}
+      \STATE $J_{t-1}^v(w)\leftarrow \min\limits_{u\in\V,u\geq w(1)}
+      c(u)+f(v,u)+\sum\limits_{w'\in\W}J_t^u(w')\times P_u(w,w')$
+      \STATE $\pi_{t-1}^v(w)\leftarrow \argmin\limits_{u\in\V,u\geq w(1)}
+      c(u)+f(v,u)+\sum\limits_{w'\in\W}J_t^u(w')\times P_u(w,w')$    
+      \ENDFOR
+      \STATE $t\leftarrow t-1$
+      \ENDWHILE
+      \RETURN $\pi^*$
+    \end{algorithmic}
+  \end{algorithm}
+\end{frame}
+
+\subsection{Résultats}
+
+\begin{frame}
+  \begin{figure}
+    \centering
+    \includegraphics[scale=0.4]{example_compare.png}
+    \caption{Comparison of the work done in standard case (orange line) and the one
+      with over cost (blue line). $T=30,\Delta=4,S=3$}
+    \label{fig:algo_overcost}
+  \end{figure}
+\end{frame}
+
+\subsection{Processeur travaillant à l'infini}
+
+\begin{frame}
+  \begin{algorithm}[H]
+    \caption{Programmation dynamique pour trouver une politique stationnaire}
+    \label{alg:inftyth}  
+    \begin{algorithmic}
+      \STATE $u^0\leftarrow (0,0,\dots,0),~u^1\leftarrow(1,0,\dots,0)$
+      \STATE $n\leftarrow1$
+      \STATE $\epsilon>0$
+      \WHILE{$span(u^n(w)-u^{n-1}(w))\geq\epsilon$}
+      \FORALL{$w\in\W$}
+      \STATE $u^{n+1}(w)\leftarrow\min\limits_{v\in\V,v\geq
+        w(1)}\left(c(v)+\sum\limits_{w'\in\W}P_v(w,w')\times u^n(w')\right)$
+      \ENDFOR
+      \STATE $n\leftarrow n+1$
+      \ENDWHILE
+      \STATE Choose any $w\in\W$ and let $g^*\rightarrow
+      u^n(w)-u^{n-1}(w)$
+      \FORALL{$w\in\W$}
+      \STATE
+      $\pi^*(w)\in\argmin\limits_{v\in\V,v\geq
+        w(1)}\left(c(v)+\sum\limits_{w'\in\W}P_v(w,w')\times
+        u^n(w')\right)$
+      \ENDFOR
+      \RETURN $\pi^*(\cdot)$
+    \end{algorithmic}
+  \end{algorithm}
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+  Nous avons vu
+  \begin{itemize}
+  \item un modèle de processeur effectuant des travaux
+  \item comment optimiser la consommation d'énergie avec ce modèle
+  \item nous avons amélioré ce modèle en prenant en compte le coût du
+    changement de vitesse
+  \item trouvé un algorithme pour ce nouveau modèle
+  \item vu un modèle sans temps imparti
+  \end{itemize}
+\end{frame}
+
+\end{document}
